@@ -19,6 +19,7 @@ public class Modelo {
     @JsonIgnoreProperties(value={"modelo","hibernateLazyInitializer","handler"}, allowSetters = true) // Esto se hace por el fecth lazy
     private Marca marca;
 
+    @NotNull(message = "La modelo no puede estar vacio")
     private String modelo;
 
     public int getIdModelo() {

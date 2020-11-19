@@ -28,14 +28,18 @@ public class Coche {
     @JsonIgnoreProperties(value={"marca","hibernateLazyInitializer","handler"}, allowSetters = true) // Esto se hace por el fecth lazy
     private Marca marca;
 
-    private String modelo;
+    @ManyToOne(fetch = FetchType.LAZY) // Muchos coches pueden tener una marca
+    @JoinColumn(name = "modelo_id")
+    @NotNull(message = "La modelo no puede estar vacia")
+    @JsonIgnoreProperties(value={"modelo","hibernateLazyInitializer","handler"}, allowSetters = true)
+    private Modelo modelo;
 
     private String transmision;
 
     @ManyToOne(fetch = FetchType.LAZY) // Muchos coches pueden tener una carroceria
     @JoinColumn(name = "carroceria_id")
     @NotNull(message = "La carroceria no puede estar vacia")
-    @JsonIgnoreProperties(value={"marca","hibernateLazyInitializer","handler"}, allowSetters = true) // Esto se hace por el fecth lazy
+    @JsonIgnoreProperties(value={"carroceria","hibernateLazyInitializer","handler"}, allowSetters = true) // Esto se hace por el fecth lazy
     private Carroceria carroceria;
 
     private int caryear;
@@ -66,11 +70,11 @@ public class Coche {
         this.marca = marca;
     }
 
-    public String getModelo() {
+    public Modelo getModelo() {
         return modelo;
     }
 
-    public void setModelo(String modelo) {
+    public void setModelo(Modelo modelo) {
         this.modelo = modelo;
     }
 

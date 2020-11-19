@@ -1,6 +1,7 @@
 package com.kevingomez.FYCBackEnd.models.entity;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 
 @Entity
 @Table(name = "carrocerias")
@@ -10,6 +11,7 @@ public class Carroceria {
     @Column(name = "carroceria_id")
     private int idCarroceria;
 
+    @NotNull(message = "La carroceria no puede estar vacia")
     private String carroceria;
 
     public int getIdCarroceria() {
