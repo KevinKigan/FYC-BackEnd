@@ -3,6 +3,8 @@ package com.kevingomez.FYCBackEnd.models.entity;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 
 @Entity
 @Table(name = "marcas")
@@ -11,6 +13,7 @@ public class Marca {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int marca_id;
 
+    @NotNull(message = "El campo 'Marca' no puede estar vacio")
     @Column(name = "marca_coche")
     private String marcaCoche;
 

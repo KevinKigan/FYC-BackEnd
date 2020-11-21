@@ -1,6 +1,7 @@
 package com.kevingomez.FYCBackEnd.models.entity;
 import javax.persistence.*;
 import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 
 @Entity
 @Table(name = "caracteristicas")
@@ -10,15 +11,15 @@ public class Caracteristica {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @NotEmpty(message = "El campo 'Hatchback' no puede estar vacio")
+    @NotNull(message = "El campo 'Hatchback' no puede estar vacio")
     @Column(name = "cocheHatchback", nullable = false)
     private boolean maleteroHatchback;
 
-    @NotEmpty(message = "El campo 'Coche de dos puertas' no puede estar vacio")
+    @NotNull(message = "El campo 'Coche de dos puertas' no puede estar vacio")
     @Column(name = "coche2puertas", nullable = false)
     private boolean maletero2puertas;
 
-    @NotEmpty(message = "El campo 'Coche de cuatro puertas' no puede estar vacio")
+    @NotNull(message = "El campo 'Coche de cuatro puertas' no puede estar vacio")
     @Column(name = "coche4puertas", nullable = false)
     private boolean maletero4puertas;
 

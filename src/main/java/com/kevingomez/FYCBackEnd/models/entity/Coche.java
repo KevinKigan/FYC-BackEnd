@@ -15,7 +15,7 @@ public class Coche {
     @Column(name = "coche_id")
     private int idCoche;
 
-    @NotEmpty(message = "El campo no puede estar vacio")
+    @NotNull(message = "El campo Eje Motriz no puede estar vacio")
     @Size(min = 3, max = 3)
     @Column(name = "eje_motriz",nullable = false)
     private String ejeMotriz;
@@ -42,9 +42,32 @@ public class Coche {
     @JsonIgnoreProperties(value={"carroceria","hibernateLazyInitializer","handler"}, allowSetters = true) // Esto se hace por el fecth lazy
     private Carroceria carroceria;
 
+    @OneToOne(fetch = FetchType.LAZY) // Un coche tiene un tipo de motor
+    @JoinColumn(name = "motor_id")
+    @NotNull(message = "La tipo de motor no puede estar vacio")
+    @JsonIgnoreProperties(value={"hibernateLazyInitializer","handler"}, allowSetters = true) // Esto se hace por el fecth lazy
+    private TipoMotor tipoMotor;
+
     private int caryear;
 
+    public Carroceria getCarroceria() {
+        return carroceria;
+    }
+
+    public void setCarroceria(Carroceria carroceria) {
+        this.carroceria = carroceria;
+    }
+
+    public TipoMotor getTipoMotor() {
+        return tipoMotor;
+    }
+
+    public void setTipoMotor(TipoMotor tipoMotor) {
+        this.tipoMotor = tipoMotor;
+    }
+
     private int precio;
+
 
     public int getIdCoche() {
         return idCoche;

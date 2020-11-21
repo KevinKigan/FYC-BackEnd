@@ -1,3 +1,40 @@
+INSERT INTO `tipos_consumos` (`tipo_consumo`) VALUES ('ConsumoNormal');
+INSERT INTO `tipos_consumos` (`tipo_consumo`) VALUES ('ConsumoAlternativo');
+INSERT INTO `tipos_consumos` (`tipo_consumo`) VALUES ('ConsumoElectrico');
+
+INSERT INTO `tipos_motores` (`motor_combustion`,`motor_electrico`) VALUES (true, false);
+INSERT INTO `tipos_motores` (`motor_combustion`,`motor_electrico`) VALUES (true, false);
+INSERT INTO `tipos_motores` (`motor_combustion`,`motor_electrico`) VALUES (true, false);
+INSERT INTO `tipos_motores` (`motor_combustion`,`motor_electrico`) VALUES (true, false);
+INSERT INTO `tipos_motores` (`motor_combustion`,`motor_electrico`) VALUES (true, false);
+INSERT INTO `tipos_motores` (`motor_combustion`,`motor_electrico`) VALUES (true, false);
+INSERT INTO `tipos_motores` (`motor_combustion`,`motor_electrico`) VALUES (true, false);
+INSERT INTO `tipos_motores` (`motor_combustion`,`motor_electrico`) VALUES (true, false);
+INSERT INTO `tipos_motores` (`motor_combustion`,`motor_electrico`) VALUES (true, false);
+INSERT INTO `tipos_motores` (`motor_combustion`,`motor_electrico`) VALUES (true, false);
+INSERT INTO `tipos_motores` (`motor_combustion`,`motor_electrico`) VALUES (true, false);
+INSERT INTO `tipos_motores` (`motor_combustion`,`motor_electrico`) VALUES (true, false);
+INSERT INTO `tipos_motores` (`motor_combustion`,`motor_electrico`) VALUES (true, false);
+INSERT INTO `tipos_motores` (`motor_combustion`,`motor_electrico`) VALUES (true, false);
+INSERT INTO `tipos_motores` (`motor_combustion`,`motor_electrico`) VALUES (true, false);
+INSERT INTO `tipos_motores` (`motor_combustion`,`motor_electrico`) VALUES (true, false);
+INSERT INTO `tipos_motores` (`motor_combustion`,`motor_electrico`) VALUES (true, false);
+INSERT INTO `tipos_motores` (`motor_combustion`,`motor_electrico`) VALUES (true, false);
+INSERT INTO `tipos_motores` (`motor_combustion`,`motor_electrico`) VALUES (true, false);
+INSERT INTO `tipos_motores` (`motor_combustion`,`motor_electrico`) VALUES (true, false);
+INSERT INTO `tipos_motores` (`motor_combustion`,`motor_electrico`) VALUES (true, false);
+INSERT INTO `tipos_motores` (`motor_combustion`,`motor_electrico`) VALUES (true, false);
+INSERT INTO `tipos_motores` (`motor_combustion`,`motor_electrico`) VALUES (true, false);
+INSERT INTO `tipos_motores` (`motor_combustion`,`motor_electrico`) VALUES (true, false);
+INSERT INTO `tipos_motores` (`motor_combustion`,`motor_electrico`) VALUES (true, false);
+INSERT INTO `tipos_motores` (`motor_combustion`,`motor_electrico`) VALUES (true, false);
+INSERT INTO `tipos_motores` (`motor_combustion`,`motor_electrico`) VALUES (true, false);
+INSERT INTO `tipos_motores` (`motor_combustion`,`motor_electrico`) VALUES (true, false);
+INSERT INTO `tipos_motores` (`motor_combustion`,`motor_electrico`) VALUES (true, false);
+INSERT INTO `tipos_motores` (`motor_combustion`,`motor_electrico`) VALUES (true, false);
+INSERT INTO `tipos_motores` (`motor_combustion`,`motor_electrico`) VALUES (true, true);
+
+
 INSERT INTO `marcas` (`marca_coche`,`url`) VALUES ('Mazda','https://www.mazda.es');
 INSERT INTO `marcas` (`marca_coche`,`url`) VALUES ('Kia','https://www.kia.com/es/');
 INSERT INTO `marcas` (`marca_coche`,`url`) VALUES ('Audi','https://www.audi.es/es/web/es.html');
@@ -64,7 +101,7 @@ INSERT INTO `carrocerias` (`carroceria`) VALUES ('Todoterreno');
 INSERT INTO `carrocerias` (`carroceria`) VALUES ('Furgoneta');
 
 INSERT INTO `modelos` (`marca_id`,`modelo`) VALUES (1,'6');                    /* 1  */
-INSERT INTO `modelos` (`marca_id`,`modelo`) VALUES (2,'Sorento FE');         /* 2  */
+INSERT INTO `modelos` (`marca_id`,`modelo`) VALUES (2,'Sorento FE');           /* 2  */
 INSERT INTO `modelos` (`marca_id`,`modelo`) VALUES (2,'Sorento');              /* 3  */
 INSERT INTO `modelos` (`marca_id`,`modelo`) VALUES (1,'CX-5');                 /* 4  */
 INSERT INTO `modelos` (`marca_id`,`modelo`) VALUES (3,'A7 quattro');           /* 5  */
@@ -77,35 +114,38 @@ INSERT INTO `modelos` (`marca_id`,`modelo`) VALUES (5,'F-Type S Convertible'); /
 INSERT INTO `modelos` (`marca_id`,`modelo`) VALUES (6,'Mulsanne');             /* 12 */
 INSERT INTO `modelos` (`marca_id`,`modelo`) VALUES (7,'Veloster');             /* 13 */
 INSERT INTO `modelos` (`marca_id`,`modelo`) VALUES (7,'Elantra GT');           /* 14 */
+INSERT INTO `modelos` (`modelo_id`,`marca_id`,`modelo`) VALUES (343,23,'ELR');           /* 14 */
 
 
-INSERT INTO `coches` (`eje_motriz`,`marca_id`,`modelo_id`,`carroceria_id`,`transmision`,`caryear`,`precio`) VALUES ('FWD',1,1,1,'Automatico',2016,22800);
-INSERT INTO `coches` (`eje_motriz`,`marca_id`,`modelo_id`,`carroceria_id`,`transmision`,`caryear`,`precio`) VALUES ('FWD',1,1,1,'Automatico',2016,22800);
-INSERT INTO `coches` (`eje_motriz`,`marca_id`,`modelo_id`,`carroceria_id`,`transmision`,`caryear`,`precio`) VALUES ('FWD',1,1,1,'Manual',2016,22800);
-INSERT INTO `coches` (`eje_motriz`,`marca_id`,`modelo_id`,`carroceria_id`,`transmision`,`caryear`,`precio`) VALUES ('AWD',2,2,3,'Automatico',2016,41000);
-INSERT INTO `coches` (`eje_motriz`,`marca_id`,`modelo_id`,`carroceria_id`,`transmision`,`caryear`,`precio`) VALUES ('FWD',2,3,3,'Automatico',2016,41000);
-INSERT INTO `coches` (`eje_motriz`,`marca_id`,`modelo_id`,`carroceria_id`,`transmision`,`caryear`,`precio`) VALUES ('FWD',2,3,3,'Automatico',2016,41000);
-INSERT INTO `coches` (`eje_motriz`,`marca_id`,`modelo_id`,`carroceria_id`,`transmision`,`caryear`,`precio`) VALUES ('FWD',2,3,3,'Automatico',2016,41000);
-INSERT INTO `coches` (`eje_motriz`,`marca_id`,`modelo_id`,`carroceria_id`,`transmision`,`caryear`,`precio`) VALUES ('FWD',1,4,3,'Manual',2016,24000);
-INSERT INTO `coches` (`eje_motriz`,`marca_id`,`modelo_id`,`carroceria_id`,`transmision`,`caryear`,`precio`) VALUES ('FWD',1,4,3,'Automatico',2016,24000);
-INSERT INTO `coches` (`eje_motriz`,`marca_id`,`modelo_id`,`carroceria_id`,`transmision`,`caryear`,`precio`) VALUES ('AWD',2,3,3,'Automatico',2016,41000);
-INSERT INTO `coches` (`eje_motriz`,`marca_id`,`modelo_id`,`carroceria_id`,`transmision`,`caryear`,`precio`) VALUES ('AWD',2,3,3,'Automatico',2016,41000);
-INSERT INTO `coches` (`eje_motriz`,`marca_id`,`modelo_id`,`carroceria_id`,`transmision`,`caryear`,`precio`) VALUES ('AWD',2,3,3,'Automatico',2016,41000);
-INSERT INTO `coches` (`eje_motriz`,`marca_id`,`modelo_id`,`carroceria_id`,`transmision`,`caryear`,`precio`) VALUES ('AWD',1,4,3,'Automatico',2016,24000);
-INSERT INTO `coches` (`eje_motriz`,`marca_id`,`modelo_id`,`carroceria_id`,`transmision`,`caryear`,`precio`) VALUES ('AWD',3,5,1,'Automatico',2016,68000);
-INSERT INTO `coches` (`eje_motriz`,`marca_id`,`modelo_id`,`carroceria_id`,`transmision`,`caryear`,`precio`) VALUES ('AWD',3,6,1,'Automatico',2016,57500);
-INSERT INTO `coches` (`eje_motriz`,`marca_id`,`modelo_id`,`carroceria_id`,`transmision`,`caryear`,`precio`) VALUES ('FWD',4,7,3,'Manual',2016,26100);
-INSERT INTO `coches` (`eje_motriz`,`marca_id`,`modelo_id`,`carroceria_id`,`transmision`,`caryear`,`precio`) VALUES ('FWD',4,7,3,'Automatico',2016,26100);
-INSERT INTO `coches` (`eje_motriz`,`marca_id`,`modelo_id`,`carroceria_id`,`transmision`,`caryear`,`precio`) VALUES ('FWD',4,7,3,'Automatico',2016,26100);
-INSERT INTO `coches` (`eje_motriz`,`marca_id`,`modelo_id`,`carroceria_id`,`transmision`,`caryear`,`precio`) VALUES ('AWD',4,7,3,'Automatico',2016,26100);
-INSERT INTO `coches` (`eje_motriz`,`marca_id`,`modelo_id`,`carroceria_id`,`transmision`,`caryear`,`precio`) VALUES ('AWD',4,7,3,'Automatico',2016,26100);
-INSERT INTO `coches` (`eje_motriz`,`marca_id`,`modelo_id`,`carroceria_id`,`transmision`,`caryear`,`precio`) VALUES ('RWD',5,8,5,'Automatico',2016,55090);
-INSERT INTO `coches` (`eje_motriz`,`marca_id`,`modelo_id`,`carroceria_id`,`transmision`,`caryear`,`precio`) VALUES ('RWD',5,9,4,'Automatico',2016,62000);
-INSERT INTO `coches` (`eje_motriz`,`marca_id`,`modelo_id`,`carroceria_id`,`transmision`,`caryear`,`precio`) VALUES ('RWD',5,10,5,'Automatico',2016,162000);
-INSERT INTO `coches` (`eje_motriz`,`marca_id`,`modelo_id`,`carroceria_id`,`transmision`,`caryear`,`precio`) VALUES ('RWD',5,11,4,'Automatico',2016,171000);
-INSERT INTO `coches` (`eje_motriz`,`marca_id`,`modelo_id`,`carroceria_id`,`transmision`,`caryear`,`precio`) VALUES ('RWD',6,12,1,'Automatico',2016,356500);
-INSERT INTO `coches` (`eje_motriz`,`marca_id`,`modelo_id`,`carroceria_id`,`transmision`,`caryear`,`precio`) VALUES ('FWD',7,13,7,'Automatico',2016,20200);
-INSERT INTO `coches` (`eje_motriz`,`marca_id`,`modelo_id`,`carroceria_id`,`transmision`,`caryear`,`precio`) VALUES ('FWD',7,13,7,'Manual',2016,20200);
-INSERT INTO `coches` (`eje_motriz`,`marca_id`,`modelo_id`,`carroceria_id`,`transmision`,`caryear`,`precio`) VALUES ('FWD',7,14,7,'Manual',2016,17000);
-INSERT INTO `coches` (`eje_motriz`,`marca_id`,`modelo_id`,`carroceria_id`,`transmision`,`caryear`,`precio`) VALUES ('AWD',5,10,5,'Automatico',2016,162000);
-INSERT INTO `coches` (`eje_motriz`,`marca_id`,`modelo_id`,`carroceria_id`,`transmision`,`caryear`,`precio`) VALUES ('AWD',5,11,4,'Automatico',2016,171000);
+
+INSERT INTO `coches` (`eje_motriz`,`marca_id`,`modelo_id`,`carroceria_id`,`motor_id`,`transmision`,`caryear`,`precio`) VALUES ('FWD',1,1,1,1,'Automatico',2016,22800);
+INSERT INTO `coches` (`eje_motriz`,`marca_id`,`modelo_id`,`carroceria_id`,`motor_id`,`transmision`,`caryear`,`precio`) VALUES ('FWD',1,1,1,2,'Automatico',2016,22800);
+INSERT INTO `coches` (`eje_motriz`,`marca_id`,`modelo_id`,`carroceria_id`,`motor_id`,`transmision`,`caryear`,`precio`) VALUES ('FWD',1,1,1,3,'Manual',2016,22800);
+INSERT INTO `coches` (`eje_motriz`,`marca_id`,`modelo_id`,`carroceria_id`,`motor_id`,`transmision`,`caryear`,`precio`) VALUES ('AWD',2,2,3,4,'Automatico',2016,41000);
+INSERT INTO `coches` (`eje_motriz`,`marca_id`,`modelo_id`,`carroceria_id`,`motor_id`,`transmision`,`caryear`,`precio`) VALUES ('FWD',2,3,3,5,'Automatico',2016,41000);
+INSERT INTO `coches` (`eje_motriz`,`marca_id`,`modelo_id`,`carroceria_id`,`motor_id`,`transmision`,`caryear`,`precio`) VALUES ('FWD',2,3,3,6,'Automatico',2016,41000);
+INSERT INTO `coches` (`eje_motriz`,`marca_id`,`modelo_id`,`carroceria_id`,`motor_id`,`transmision`,`caryear`,`precio`) VALUES ('FWD',2,3,3,7,'Automatico',2016,41000);
+INSERT INTO `coches` (`eje_motriz`,`marca_id`,`modelo_id`,`carroceria_id`,`motor_id`,`transmision`,`caryear`,`precio`) VALUES ('FWD',1,4,3,8,'Manual',2016,24000);
+INSERT INTO `coches` (`eje_motriz`,`marca_id`,`modelo_id`,`carroceria_id`,`motor_id`,`transmision`,`caryear`,`precio`) VALUES ('FWD',1,4,3,9,'Automatico',2016,24000);
+INSERT INTO `coches` (`eje_motriz`,`marca_id`,`modelo_id`,`carroceria_id`,`motor_id`,`transmision`,`caryear`,`precio`) VALUES ('AWD',2,3,3,10,'Automatico',2016,41000);
+INSERT INTO `coches` (`eje_motriz`,`marca_id`,`modelo_id`,`carroceria_id`,`motor_id`,`transmision`,`caryear`,`precio`) VALUES ('AWD',2,3,3,11,'Automatico',2016,41000);
+INSERT INTO `coches` (`eje_motriz`,`marca_id`,`modelo_id`,`carroceria_id`,`motor_id`,`transmision`,`caryear`,`precio`) VALUES ('AWD',2,3,3,12,'Automatico',2016,41000);
+INSERT INTO `coches` (`eje_motriz`,`marca_id`,`modelo_id`,`carroceria_id`,`motor_id`,`transmision`,`caryear`,`precio`) VALUES ('AWD',1,4,3,13,'Automatico',2016,24000);
+INSERT INTO `coches` (`eje_motriz`,`marca_id`,`modelo_id`,`carroceria_id`,`motor_id`,`transmision`,`caryear`,`precio`) VALUES ('AWD',3,5,1,14,'Automatico',2016,68000);
+INSERT INTO `coches` (`eje_motriz`,`marca_id`,`modelo_id`,`carroceria_id`,`motor_id`,`transmision`,`caryear`,`precio`) VALUES ('AWD',3,6,1,15,'Automatico',2016,57500);
+INSERT INTO `coches` (`eje_motriz`,`marca_id`,`modelo_id`,`carroceria_id`,`motor_id`,`transmision`,`caryear`,`precio`) VALUES ('FWD',4,7,3,16,'Manual',2016,26100);
+INSERT INTO `coches` (`eje_motriz`,`marca_id`,`modelo_id`,`carroceria_id`,`motor_id`,`transmision`,`caryear`,`precio`) VALUES ('FWD',4,7,3,17,'Automatico',2016,26100);
+INSERT INTO `coches` (`eje_motriz`,`marca_id`,`modelo_id`,`carroceria_id`,`motor_id`,`transmision`,`caryear`,`precio`) VALUES ('FWD',4,7,3,18,'Automatico',2016,26100);
+INSERT INTO `coches` (`eje_motriz`,`marca_id`,`modelo_id`,`carroceria_id`,`motor_id`,`transmision`,`caryear`,`precio`) VALUES ('AWD',4,7,3,19,'Automatico',2016,26100);
+INSERT INTO `coches` (`eje_motriz`,`marca_id`,`modelo_id`,`carroceria_id`,`motor_id`,`transmision`,`caryear`,`precio`) VALUES ('AWD',4,7,3,20,'Automatico',2016,26100);
+INSERT INTO `coches` (`eje_motriz`,`marca_id`,`modelo_id`,`carroceria_id`,`motor_id`,`transmision`,`caryear`,`precio`) VALUES ('RWD',5,8,5,21,'Automatico',2016,55090);
+INSERT INTO `coches` (`eje_motriz`,`marca_id`,`modelo_id`,`carroceria_id`,`motor_id`,`transmision`,`caryear`,`precio`) VALUES ('RWD',5,9,4,22,'Automatico',2016,62000);
+INSERT INTO `coches` (`eje_motriz`,`marca_id`,`modelo_id`,`carroceria_id`,`motor_id`,`transmision`,`caryear`,`precio`) VALUES ('RWD',5,10,5,23,'Automatico',2016,162000);
+INSERT INTO `coches` (`eje_motriz`,`marca_id`,`modelo_id`,`carroceria_id`,`motor_id`,`transmision`,`caryear`,`precio`) VALUES ('RWD',5,11,4,24,'Automatico',2016,171000);
+INSERT INTO `coches` (`eje_motriz`,`marca_id`,`modelo_id`,`carroceria_id`,`motor_id`,`transmision`,`caryear`,`precio`) VALUES ('RWD',6,12,1,25,'Automatico',2016,356500);
+INSERT INTO `coches` (`eje_motriz`,`marca_id`,`modelo_id`,`carroceria_id`,`motor_id`,`transmision`,`caryear`,`precio`) VALUES ('FWD',7,13,7,26,'Automatico',2016,20200);
+INSERT INTO `coches` (`eje_motriz`,`marca_id`,`modelo_id`,`carroceria_id`,`motor_id`,`transmision`,`caryear`,`precio`) VALUES ('FWD',7,13,7,27,'Manual',2016,20200);
+INSERT INTO `coches` (`eje_motriz`,`marca_id`,`modelo_id`,`carroceria_id`,`motor_id`,`transmision`,`caryear`,`precio`) VALUES ('FWD',7,14,7,28,'Manual',2016,17000);
+INSERT INTO `coches` (`eje_motriz`,`marca_id`,`modelo_id`,`carroceria_id`,`motor_id`,`transmision`,`caryear`,`precio`) VALUES ('AWD',5,10,5,29,'Automatico',2016,162000);
+INSERT INTO `coches` (`eje_motriz`,`marca_id`,`modelo_id`,`carroceria_id`,`motor_id`,`transmision`,`caryear`,`precio`) VALUES ('AWD',5,11,4,30,'Automatico',2016,171000);
+INSERT INTO `coches` (`eje_motriz`,`marca_id`,`modelo_id`,`carroceria_id`,`motor_id`,`transmision`,`caryear`,`precio`) VALUES ('FWD',23,343,5,31,'Automatico',2016,75000);
