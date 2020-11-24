@@ -6,10 +6,11 @@ import javax.persistence.*;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import java.io.Serializable;
 
 @Entity
 @Table(name = "coches")
-public class Coche {
+public class Coche implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "coche_id")
@@ -25,13 +26,13 @@ public class Coche {
     @ManyToOne(fetch = FetchType.LAZY) // Muchos coches pueden tener una marca
     @JoinColumn(name = "marca_id")
     @NotNull(message = "La marca no puede estar vacia")
-    @JsonIgnoreProperties(value={"marca","hibernateLazyInitializer","handler"}, allowSetters = true) // Esto se hace por el fecth lazy
+    @JsonIgnoreProperties(value={"hibernateLazyInitializer","handler"}, allowSetters = true) // Esto se hace por el fecth lazy
     private Marca marca;
 
     @ManyToOne(fetch = FetchType.LAZY) // Muchos coches pueden tener una marca
     @JoinColumn(name = "modelo_id")
     @NotNull(message = "La modelo no puede estar vacia")
-    @JsonIgnoreProperties(value={"modelo","hibernateLazyInitializer","handler"}, allowSetters = true)
+    @JsonIgnoreProperties(value={"marca","hibernateLazyInitializer","handler"}, allowSetters = true)
     private Modelo modelo;
 
     private String transmision;
@@ -39,16 +40,19 @@ public class Coche {
     @ManyToOne(fetch = FetchType.LAZY) // Muchos coches pueden tener una carroceria
     @JoinColumn(name = "carroceria_id")
     @NotNull(message = "La carroceria no puede estar vacia")
-    @JsonIgnoreProperties(value={"carroceria","hibernateLazyInitializer","handler"}, allowSetters = true) // Esto se hace por el fecth lazy
+    @JsonIgnoreProperties(value={"hibernateLazyInitializer","handler"}, allowSetters = true) // Esto se hace por el fecth lazy
     private Carroceria carroceria;
 
     @OneToOne(fetch = FetchType.LAZY) // Un coche tiene un tipo de motor
-    @JoinColumn(name = "motor_id")
+    @JoinColumn(name = "tipo_motor_id")
     @NotNull(message = "La tipo de motor no puede estar vacio")
     @JsonIgnoreProperties(value={"hibernateLazyInitializer","handler"}, allowSetters = true) // Esto se hace por el fecth lazy
     private TipoMotor tipoMotor;
 
+
     private int caryear;
+
+    private int precio;
 
     public Carroceria getCarroceria() {
         return carroceria;
@@ -65,8 +69,6 @@ public class Coche {
     public void setTipoMotor(TipoMotor tipoMotor) {
         this.tipoMotor = tipoMotor;
     }
-
-    private int precio;
 
 
     public int getIdCoche() {

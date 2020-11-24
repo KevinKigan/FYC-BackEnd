@@ -1,4 +1,6 @@
 package com.kevingomez.FYCBackEnd.models.entity;
 
-public class Emision {
+import java.io.Serializable;
+
+public class Emision  implements Serializable {
 }

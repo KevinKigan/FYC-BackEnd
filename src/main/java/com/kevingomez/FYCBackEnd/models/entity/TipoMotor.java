@@ -1,32 +1,42 @@
 package com.kevingomez.FYCBackEnd.models.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import javax.persistence.*;
-import javax.validation.constraints.NotNull;
+import java.io.Serializable;
 
 
 @Entity
 @Table(name = "tipos_motores")
-public class TipoMotor {
+public class TipoMotor implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "motor_id")
-    private int idMotor;
+    @Column(name = "tipo_motor_id")
+    private int idTipoMotor;
 
-    @NotNull(message = "El campo 'Tipo de motor combustion' no puede estar vacio")
     @Column(name = "motor_combustion")
     private boolean motorCombustion;
-
-
-    @NotNull(message = "El campo 'Tipo de motor electrico' no puede estar vacio")
     @Column(name = "motor_electrico")
     private boolean motorElectrico;
 
-    public int getIdMotor() {
-        return idMotor;
+//    @OneToOne(fetch = FetchType.LAZY)
+//    @NotNull(message = "El campo 'Tipo de motor combustion' no puede estar vacio")
+//    @Column(name = "motor_combustion_id")
+//    private MotorConbustion motorCombustion;
+//
+//
+//    @OneToOne(fetch = FetchType.LAZY)
+//    //@NotNull(message = "El campo 'Tipo de motor electrico' no puede estar vacio")
+//    @Column(name = "motor_electrico_id")
+//    private MotorElectrico motorElectrico;
+
+
+    public int getIdTipoMotor() {
+        return idTipoMotor;
     }
 
-    public void setIdMotor(int idMotor) {
-        this.idMotor = idMotor;
+    public void setIdTipoMotor(int idTipoMotor) {
+        this.idTipoMotor = idTipoMotor;
     }
 
     public boolean isMotorCombustion() {

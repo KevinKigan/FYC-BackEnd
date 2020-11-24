@@ -5,13 +5,15 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import javax.persistence.*;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
+import java.io.Serializable;
 
 @Entity
 @Table(name = "marcas")
-public class Marca {
+public class Marca  implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int marca_id;
+    @Column(name = "marca_id")
+    private int idMarca;
 
     @NotNull(message = "El campo 'Marca' no puede estar vacio")
     @Column(name = "marca_coche")
@@ -26,19 +28,11 @@ public class Marca {
     private String url;
 
     public int getIdMarca() {
-        return marca_id;
+        return idMarca;
     }
 
-    public void setIdMarca(int marca_id) {
-        this.marca_id = marca_id;
-    }
-
-    public int getMarca_id() {
-        return marca_id;
-    }
-
-    public void setMarca_id(int marca_id) {
-        this.marca_id = marca_id;
+    public void setIdMarca(int idMarca) {
+        this.idMarca = idMarca;
     }
 
     public String getMarcaCoche() {

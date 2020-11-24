@@ -1,4 +1,6 @@
 package com.kevingomez.FYCBackEnd.models.entity;
 
-public class ConsumoElectrico {
+import java.io.Serializable;
+
+public class ConsumoElectrico  implements Serializable {
 }

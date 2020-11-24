@@ -3,10 +3,11 @@ package com.kevingomez.FYCBackEnd.models.entity;
 import javax.persistence.*;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
+import java.io.Serializable;
 
 @Entity
 @Table(name = "tipos_consumos")
-public class TipoConsumo {
+public class TipoConsumo  implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "tipo_consumo_id")
