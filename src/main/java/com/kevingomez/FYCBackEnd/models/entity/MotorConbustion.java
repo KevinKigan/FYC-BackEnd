@@ -7,7 +7,7 @@ import java.io.Serializable;
 
 @Entity
 @Table(name = "motores_combustion")
-public class MotorConbustion  implements Serializable {
+public class MotorConbustion implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "motor_combustion_id")
@@ -19,25 +19,15 @@ public class MotorConbustion  implements Serializable {
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "sobrealimentacion_id")
+    @JsonIgnoreProperties(value={"hibernateLazyInitializer","handler"}, allowSetters = true) // Esto se hace por el fecth lazy
     private Sobrealimentacion sobrealimentacion;
 
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "coche_id")
-    @JsonIgnoreProperties(value={"coche","hibernateLazyInitializer","handler"}, allowSetters = true)
-    private Coche coche;
-
-    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "combustible_id")
+    @JsonIgnoreProperties(value={"hibernateLazyInitializer","handler"}, allowSetters = true) // Esto se hace por el fecth lazy
     private Combustible combustible;
 
     private int hp;
-
-    public Coche getCoche() {
-        return coche;
-    }
-
-    public void setCoche(Coche coche) {
-        this.coche = coche;
-    }
 
     public int getIdMotorCombustion() {
         return idMotorCombustion;
@@ -67,9 +57,7 @@ public class MotorConbustion  implements Serializable {
         return sobrealimentacion;
     }
 
-    public void setSobrealimentacion(Sobrealimentacion sobrealimentacion) {
-        this.sobrealimentacion = sobrealimentacion;
-    }
+    public void setSobrealimentacion(Sobrealimentacion sobrealimentacion) { this.sobrealimentacion = sobrealimentacion; }
 
     public Combustible getCombustible() {
         return combustible;
@@ -86,4 +74,5 @@ public class MotorConbustion  implements Serializable {
     public void setHp(int hp) {
         this.hp = hp;
     }
+
 }

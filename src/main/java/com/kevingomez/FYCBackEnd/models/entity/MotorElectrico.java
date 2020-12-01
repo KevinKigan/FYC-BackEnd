@@ -14,20 +14,17 @@ public class MotorElectrico implements Serializable {
     @Column(name = "motor_electrico_id")
     private int idMotorElectrico;
 
-    @OneToOne(fetch = FetchType.LAZY) // Un motor tiene un coche
-    @JoinColumn(name = "coche_id")
-    @JsonIgnoreProperties(value={"coche","hibernateLazyInitializer","handler"}, allowSetters = true)
-    private Coche coche;
-
+    @Column(name = "t_carga220v")
     private double tCarga220v;
 
-    @ElementCollection
-    @JoinColumn(name = "potencia_electrica_id")
-    private List<Integer> potenciaElectrica;
+    @OneToMany(fetch = FetchType.LAZY)
+    @JsonIgnoreProperties(value={"hibernateLazyInitializer","handler"}, allowSetters = true)
+    @JoinTable(name = "motores_electricos_potencias_electrica", joinColumns=@JoinColumn(name = "motor_electrico_id"), inverseJoinColumns = @JoinColumn(name = "potencia_electrica_id"))
+    private List<PotenciaElectrica> potenciaElectrica;
 
-    @ElementCollection
-    @JoinColumn(name = "hp_id")
-    private List<Integer> hp;
+    @OneToMany(fetch = FetchType.LAZY)
+    @JoinTable(name = "motores_electricos_hp", joinColumns=@JoinColumn(name = "motor_electrico_id"), inverseJoinColumns = @JoinColumn(name = "hp_id"))
+    private List<HP_Electrico> hp;
 
     public int getIdMotorElectrico() {
         return idMotorElectrico;
@@ -35,14 +32,6 @@ public class MotorElectrico implements Serializable {
 
     public void setIdMotorElectrico(int idMotorElectrico) {
         this.idMotorElectrico = idMotorElectrico;
-    }
-
-    public Coche getCoche() {
-        return coche;
-    }
-
-    public void setCoche(Coche coche) {
-        this.coche = coche;
     }
 
     public double gettCarga220v() {
@@ -53,19 +42,19 @@ public class MotorElectrico implements Serializable {
         this.tCarga220v = tCarga220v;
     }
 
-    public List<Integer> getPotenciaElectrica() {
+    public List<PotenciaElectrica> getPotenciaElectrica() {
         return potenciaElectrica;
     }
 
-    public void setPotenciaElectrica(List<Integer> potenciaElectrica) {
+    public void setPotenciaElectrica(List<PotenciaElectrica> potenciaElectrica) {
         this.potenciaElectrica = potenciaElectrica;
     }
 
-    public List<Integer> getHp() {
+    public List<HP_Electrico> getHp() {
         return hp;
     }
 
-    public void setHp(List<Integer> hp) {
+    public void setHp(List<HP_Electrico> hp) {
         this.hp = hp;
     }
 }

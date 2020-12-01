@@ -42,14 +42,6 @@ public class Marca  implements Serializable {
     public void setMarcaCoche(String marcaCoche) {
         this.marcaCoche = marcaCoche;
     }
-//
-//    public Coche getCoche() {
-//        return coche;
-//    }
-//
-//    public void setCoche(Coche coche) {
-//        this.coche = coche;
-//    }
 
     public String getUrl() {
         return url;
@@ -58,4 +50,5 @@ public class Marca  implements Serializable {
     public void setUrl(String url) {
         this.url = url;
     }
+
 }

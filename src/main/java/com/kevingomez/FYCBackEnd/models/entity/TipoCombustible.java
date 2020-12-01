@@ -28,4 +28,5 @@ public class TipoCombustible implements Serializable {
     public void setCombustible(String combustible) {
         this.combustible = combustible;
     }
+
 }

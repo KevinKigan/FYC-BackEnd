@@ -17,5 +17,28 @@ public class Combustible  implements Serializable {
     @Column(name = "combustible_alternativo")
     private String combustibleAlternativo;
 
+    public int getIdCombustible() {
+        return idCombustible;
+    }
+
+    public void setIdCombustible(int idCombustible) {
+        this.idCombustible = idCombustible;
+    }
+
+    public String getCombustibleNormal() {
+        return combustibleNormal;
+    }
+
+    public void setCombustibleNormal(String combustibleNormal) {
+        this.combustibleNormal = combustibleNormal;
+    }
+
+    public String getCombustibleAlternativo() {
+        return combustibleAlternativo;
+    }
+
+    public void setCombustibleAlternativo(String combustibleAlternativo) {
+        this.combustibleAlternativo = combustibleAlternativo;
+    }
 
 }

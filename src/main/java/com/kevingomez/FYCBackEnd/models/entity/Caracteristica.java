@@ -55,4 +55,5 @@ public class Caracteristica  implements Serializable {
     public void setMaletero4puertas(boolean maletero4puertas) {
         this.maletero4puertas = maletero4puertas;
     }
+
 }

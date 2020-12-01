@@ -32,4 +32,5 @@ public class TipoConsumo  implements Serializable {
     public void setTipoConsumo(String tipoConsumo) {
         this.tipoConsumo = tipoConsumo;
     }
+
 }

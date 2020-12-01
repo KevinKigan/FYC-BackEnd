@@ -16,19 +16,10 @@ public class TipoMotor implements Serializable {
 
     @Column(name = "motor_combustion")
     private boolean motorCombustion;
+
+
     @Column(name = "motor_electrico")
     private boolean motorElectrico;
-
-//    @OneToOne(fetch = FetchType.LAZY)
-//    @NotNull(message = "El campo 'Tipo de motor combustion' no puede estar vacio")
-//    @Column(name = "motor_combustion_id")
-//    private MotorConbustion motorCombustion;
-//
-//
-//    @OneToOne(fetch = FetchType.LAZY)
-//    //@NotNull(message = "El campo 'Tipo de motor electrico' no puede estar vacio")
-//    @Column(name = "motor_electrico_id")
-//    private MotorElectrico motorElectrico;
 
 
     public int getIdTipoMotor() {

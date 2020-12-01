@@ -14,4 +14,29 @@ public class Sobrealimentacion  implements Serializable {
     private boolean turbo;
 
     private boolean supercargador;
+
+    public int getIdSobrealimentacion() {
+        return idSobrealimentacion;
+    }
+
+    public void setIdSobrealimentacion(int idSobrealimentacion) {
+        this.idSobrealimentacion = idSobrealimentacion;
+    }
+
+    public boolean isTurbo() {
+        return turbo;
+    }
+
+    public void setTurbo(boolean turbo) {
+        this.turbo = turbo;
+    }
+
+    public boolean isSupercargador() {
+        return supercargador;
+    }
+
+    public void setSupercargador(boolean supercargador) {
+        this.supercargador = supercargador;
+    }
+
 }
