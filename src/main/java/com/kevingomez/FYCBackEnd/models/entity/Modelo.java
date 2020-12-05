@@ -17,11 +17,17 @@ public class Modelo  implements Serializable {
     @ManyToOne(fetch = FetchType.LAZY) // Muchos modelos pueden tener una marca
     @JoinColumn(name = "marca_id")
     @NotNull(message = "La marca no puede estar vacia")
-    @JsonIgnoreProperties(value={"modelo","hibernateLazyInitializer","handler"}, allowSetters = true) // Esto se hace por el fecth lazy
+    @JsonIgnoreProperties(value={"modelo","hibernateLazyInitializer","handler"}, allowSetters = true)
     private Marca marca;
 
     @NotNull(message = "La modelo no puede estar vacio")
     private String modelo;
+
+    @OneToOne(fetch = FetchType.LAZY) // Un coche tiene un volumen
+    @JoinColumn(name = "volumen_id")
+    @JsonIgnoreProperties(value={"volumen2p","volumen4p","volumenHatchback","startstop","hibernateLazyInitializer","handler"}, allowSetters = true)
+    private Volumen volumen;
+
 
     public int getIdModelo() {
         return idModelo;
@@ -41,6 +47,14 @@ public class Modelo  implements Serializable {
 
     public String getModelo() {
         return modelo;
+    }
+
+    public Volumen getVolumen() {
+        return volumen;
+    }
+
+    public void setVolumen(Volumen volumen) {
+        this.volumen = volumen;
     }
 
     public void setModelo(String modelo) {

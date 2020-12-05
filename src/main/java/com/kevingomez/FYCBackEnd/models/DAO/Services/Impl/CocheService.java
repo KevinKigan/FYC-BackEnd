@@ -5,7 +5,7 @@ import com.kevingomez.FYCBackEnd.models.DAO.dao.Interfaces.ICocheDAO;
 import com.kevingomez.FYCBackEnd.models.DAO.dao.Interfaces.IMotorCombustionDAO;
 import com.kevingomez.FYCBackEnd.models.DAO.dao.Interfaces.IMotorElectricoDAO;
 import com.kevingomez.FYCBackEnd.models.entity.Coche;
-import com.kevingomez.FYCBackEnd.models.entity.MotorConbustion;
+import com.kevingomez.FYCBackEnd.models.entity.MotorCombustion;
 import com.kevingomez.FYCBackEnd.models.entity.MotorElectrico;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -29,7 +29,7 @@ public class CocheService implements ICocheService {
     }
 
     @Override
-    public List<MotorConbustion> findAllMotorCombustion() {
+    public List<MotorCombustion> findAllMotorCombustion() {
         return motorCombustionDAO.findAll();
     }
 

@@ -3,6 +3,7 @@ package com.kevingomez.FYCBackEnd.models.entity;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 import java.util.List;
 
 @Entity
@@ -13,6 +14,7 @@ public class PotenciaElectrica {
     @Column(name = "potencia_electrica_id")
     private int idPotenciaElectrica;
 
+    @NotNull(message = "La potencia no puede estar vacia")
     private int potencia;
 
 
@@ -23,7 +25,7 @@ public class PotenciaElectrica {
     public void setIdPotenciaElectrica(int idPotenciaElectrica) {
         this.idPotenciaElectrica = idPotenciaElectrica;
     }
-    
+
     public int getPotencia() {
         return potencia;
     }

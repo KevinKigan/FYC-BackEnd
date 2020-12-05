@@ -1,6 +1,9 @@
 package com.kevingomez.FYCBackEnd.models.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 
 @Entity
@@ -11,11 +14,16 @@ public class Combustible  implements Serializable {
     @Column(name = "combustible_id")
     private int idCombustible;
 
-    @Column(name = "combustible_normal")
-    private String combustibleNormal;
+    @ManyToOne(fetch = FetchType.LAZY) // Muchos combustibles pueden tener un tipo combustible
+    @JoinColumn(name = "tipo_combustible_normal_id")
+    @JsonIgnoreProperties(value={"idCombustible","hibernateLazyInitializer","handler"}, allowSetters = true)
+    private TipoCombustible tipoCombustibleNormal;
 
-    @Column(name = "combustible_alternativo")
-    private String combustibleAlternativo;
+    @ManyToOne(fetch = FetchType.LAZY) // Muchos combustibles pueden tener un tipo combustible
+    @JoinColumn(name = "tipo_combustible_alternativo_id")
+    @JsonIgnoreProperties(value={"idCombustible","hibernateLazyInitializer","handler"}, allowSetters = true)
+    private TipoCombustible tipoCombustibleAlternativo;
+
 
     public int getIdCombustible() {
         return idCombustible;
@@ -25,20 +33,19 @@ public class Combustible  implements Serializable {
         this.idCombustible = idCombustible;
     }
 
-    public String getCombustibleNormal() {
-        return combustibleNormal;
+    public TipoCombustible getTipoCombustibleNormal() {
+        return tipoCombustibleNormal;
     }
 
-    public void setCombustibleNormal(String combustibleNormal) {
-        this.combustibleNormal = combustibleNormal;
+    public void setTipoCombustibleNormal(TipoCombustible tipoCombustibleNormal) {
+        this.tipoCombustibleNormal = tipoCombustibleNormal;
     }
 
-    public String getCombustibleAlternativo() {
-        return combustibleAlternativo;
+    public TipoCombustible getTipoCombustibleAlternativo() {
+        return tipoCombustibleAlternativo;
     }
 
-    public void setCombustibleAlternativo(String combustibleAlternativo) {
-        this.combustibleAlternativo = combustibleAlternativo;
+    public void setTipoCombustibleAlternativo(TipoCombustible tipoCombustibleAlternativo) {
+        this.tipoCombustibleAlternativo = tipoCombustibleAlternativo;
     }
-
 }

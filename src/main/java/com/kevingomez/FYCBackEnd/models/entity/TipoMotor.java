@@ -14,12 +14,16 @@ public class TipoMotor implements Serializable {
     @Column(name = "tipo_motor_id")
     private int idTipoMotor;
 
-    @Column(name = "motor_combustion")
-    private boolean motorCombustion;
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "motor_combustion_id")
+    @JsonIgnoreProperties(value={"hibernateLazyInitializer","handler"}, allowSetters = true)
+    private MotorCombustion motorCombustion;
 
 
-    @Column(name = "motor_electrico")
-    private boolean motorElectrico;
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "motor_electrico_id")
+    @JsonIgnoreProperties(value={"hibernateLazyInitializer","handler"}, allowSetters = true)
+    private MotorElectrico motorElectrico;
 
 
     public int getIdTipoMotor() {
@@ -30,19 +34,19 @@ public class TipoMotor implements Serializable {
         this.idTipoMotor = idTipoMotor;
     }
 
-    public boolean isMotorCombustion() {
+    public MotorCombustion getMotorCombustion() {
         return motorCombustion;
     }
 
-    public void setMotorCombustion(boolean motorCombustion) {
+    public void setMotorCombustion(MotorCombustion motorCombustion) {
         this.motorCombustion = motorCombustion;
     }
 
-    public boolean isMotorElectrico() {
+    public MotorElectrico getMotorElectrico() {
         return motorElectrico;
     }
 
-    public void setMotorElectrico(boolean motorElectrico) {
+    public void setMotorElectrico(MotorElectrico motorElectrico) {
         this.motorElectrico = motorElectrico;
     }
 }

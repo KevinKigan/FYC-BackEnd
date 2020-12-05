@@ -1,6 +1,7 @@
 package com.kevingomez.FYCBackEnd.models.entity;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 
 @Entity
@@ -8,25 +9,27 @@ import java.io.Serializable;
 public class TipoCombustible implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "combustible_id")
-    private int idCombustible;
+    @Column(name = "tipo_combustible_id")
+    private int idTipoCombustible;
 
-    private String combustible;
+    @Column(name = "tipo_combustible")
+    @NotNull(message = "El tipo de combustible no puede estar vacio")
+    private String tipoCombustible;
 
     public int getIdCombustible() {
-        return idCombustible;
+        return idTipoCombustible;
     }
 
-    public void setIdCombustible(int idCombustible) {
-        this.idCombustible = idCombustible;
+    public void setIdCombustible(int idTipoCombustible) {
+        this.idTipoCombustible = idTipoCombustible;
     }
 
-    public String getCombustible() {
-        return combustible;
+    public String getTipoCombustible() {
+        return tipoCombustible;
     }
 
-    public void setCombustible(String combustible) {
-        this.combustible = combustible;
+    public void setCombustible(String tipoCombustible) {
+        this.tipoCombustible = tipoCombustible;
     }
 
 }

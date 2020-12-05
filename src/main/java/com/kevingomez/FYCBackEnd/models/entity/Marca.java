@@ -15,16 +15,11 @@ public class Marca  implements Serializable {
     @Column(name = "marca_id")
     private int idMarca;
 
-    @NotNull(message = "El campo 'Marca' no puede estar vacio")
+    @NotNull(message = "El campo Marca no puede estar vacio")
     @Column(name = "marca_coche")
     private String marcaCoche;
 
-    // Fetch tipo lazy para que no realice la consulta y obtenga los hijos y/o nietos
-    // Json ignore omite una llamada recursiva a si mismo cuando es una relacion entre entidades
-//    @OneToOne(fetch = FetchType.LAZY)
-//    @JsonIgnoreProperties(value={"marca","hibernateLazyInitializer","handler"}, allowSetters = true)
-//    private Coche coche;
-
+    @NotNull(message = "El campo url de la marca no puede estar vacio")
     private String url;
 
     public int getIdMarca() {

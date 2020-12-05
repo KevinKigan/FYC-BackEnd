@@ -3,6 +3,7 @@ package com.kevingomez.FYCBackEnd.models.entity;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 
 @Entity
 @Table(name = "hp_electricos")
@@ -12,6 +13,7 @@ public class HP_Electrico {
     @Column(name = "hp_id")
     private int idHP;
 
+    @NotNull(message = "El campo CV no puede estar vacio")
     private int hp;
 
     public int getIdHP() {
