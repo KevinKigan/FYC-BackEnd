@@ -26,12 +26,14 @@ public class MotorElectrico implements Serializable {
      */
     @OneToMany(fetch = FetchType.LAZY)
     @JsonIgnoreProperties(value={"idPotenciaElectrica","hibernateLazyInitializer","handler"}, allowSetters = true)
-    @JoinTable(name = "motores_electricos_potencias_electrica", joinColumns=@JoinColumn(name = "motor_electrico_id"), inverseJoinColumns = @JoinColumn(name = "potencia_electrica_id"))
+    @JoinTable(name = "motores_electricos_potencias_electrica", joinColumns=@JoinColumn(name = "motor_electrico_id"),
+            inverseJoinColumns = @JoinColumn(name = "potencia_electrica_id"))
     private List<PotenciaElectrica> potenciasElectricas;
 
     @OneToMany(fetch = FetchType.LAZY)
     @JsonIgnoreProperties(value={"idHP","hibernateLazyInitializer","handler"}, allowSetters = true)
-    @JoinTable(name = "motores_electricos_hp", joinColumns=@JoinColumn(name = "motor_electrico_id"), inverseJoinColumns = @JoinColumn(name = "hp_id"))
+    @JoinTable(name = "motores_electricos_hp", joinColumns=@JoinColumn(name = "motor_electrico_id"),
+            inverseJoinColumns = @JoinColumn(name = "hp_id"))
     private List<HP_Electrico> hps;
 
 
