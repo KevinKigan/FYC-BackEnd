@@ -1,8 +1,10 @@
 package com.kevingomez.FYCBackEnd.models.DAO.Services.Impl;
 
 import com.kevingomez.FYCBackEnd.models.DAO.Services.Interfaces.ICocheService;
+import com.kevingomez.FYCBackEnd.models.DAO.Services.Interfaces.IFiltrosService;
 import com.kevingomez.FYCBackEnd.models.DAO.dao.Interfaces.*;
 import com.kevingomez.FYCBackEnd.models.entity.*;
+import com.kevingomez.FYCBackEnd.models.filters.Filter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,7 +12,6 @@ import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -40,6 +41,8 @@ public class CocheService implements ICocheService {
     private IMotorCombustionDAO motorCombustionDAO;
     @Autowired
     private IMotorElectricoDAO motorElectricoDAO;
+    @Autowired
+    private IFiltrosService filtrosService;
 
     private static Logger log = LoggerFactory.getLogger(CocheService.class);
 
@@ -65,6 +68,45 @@ public class CocheService implements ICocheService {
     public List<Marca> findAllMarcas() {
         return marcaDAO.findAll();
     }
+
+    /**
+     * Metodo para buscar en bbdd todas las carrocerias
+     *
+     * @return Lista de carrocerias
+     */
+    @Override
+    @Transactional(readOnly = true) //Select solo de lectura
+    public List<Carroceria> findAllCarrocerias() {
+        return carroceriaDAO.findAll();
+    }
+
+    /**
+     * Metodo para buscar los coches segun los filtros estipulados
+     *
+     * @param filtros Filtros de coche que queremos
+     * @return Pagina con los coches
+     */
+    @Override
+    @Transactional(readOnly = true) //Select solo de lectura
+    public List<Modelo> findAllModelosFiltrados(Pageable pageable, Filter filtros) {
+        return this.filtrosService.filtrarModelos(filtros);
+
+//        Carroceria c = this.carroceriaDAO.getCarroceriaByCarroceria(filtros.getCarroceria().getCarroceria());
+//        List<Coche> coches = this.cocheDAO.findAllModeloDistinctByCarroceria_IdCarroceria(c.getIdCarroceria());
+//        ArrayList<Integer> modelos = new ArrayList<>();
+//        for (Coche coche: coches) {
+//            if(!modelos.contains(coche.getModelo().getIdModelo())){
+//                System.out.println(coche.getModelo().getIdModelo());
+//                modelos.add(coche.getModelo().getIdModelo());
+//            }
+//        }
+//
+//        List<Modelo> mod = this.modeloDAO.findAllByIdModeloIn(modelos);
+
+    }
+
+
+
 
     /**
      * Metodo para retornar un coche segun su id
@@ -102,6 +144,7 @@ public class CocheService implements ICocheService {
     @Transactional(readOnly = true) //Select solo de lectura
     public Page<Modelo> findAllModelos(Pageable pageable) {
         // Lo retorna si lo encuentra y en caso contrario retorna null
+        Page p = modeloDAO.findAll(pageable);
         return modeloDAO.findAll(pageable);
     }
 
@@ -116,6 +159,18 @@ public class CocheService implements ICocheService {
     public Page<Modelo> findAllModelosPorMarca(Pageable pageable, int idMarca) {
         // Lo retorna si lo encuentra y en caso contrario retorna null
         return modeloDAO.findAllByMarca_IdMarca(pageable, idMarca);
+    }
+
+    /**
+     * Metodo para retornar todos los modelos segun la marca especificada
+     *
+     * @return Lista con los modelos
+     */
+    @Override
+    @Transactional(readOnly = true) //Select solo de lectura
+    public List<Modelo> findAllModelosPorMarca(int idMarca) {
+        // Lo retorna si lo encuentra y en caso contrario retorna null
+        return modeloDAO.findAllByMarca_IdMarca(idMarca);
     }
 
     /**

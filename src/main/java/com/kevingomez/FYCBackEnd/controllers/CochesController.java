@@ -1,6 +1,7 @@
 package com.kevingomez.FYCBackEnd.controllers;
 
 import com.kevingomez.FYCBackEnd.models.DAO.Services.Interfaces.ICocheService;
+import com.kevingomez.FYCBackEnd.models.DAO.Services.Interfaces.IFiltrosService;
 import com.kevingomez.FYCBackEnd.models.DAO.Services.Interfaces.ISubirFicheroService;
 import com.kevingomez.FYCBackEnd.models.entity.*;
 import org.slf4j.Logger;
@@ -9,14 +10,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.net.MalformedURLException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @CrossOrigin(origins = {"http://localhost:4200"})
 @RestController
@@ -27,6 +29,9 @@ public class CochesController {
 
     @Autowired
     private ICocheService cocheService;
+
+    @Autowired
+    private IFiltrosService filtrosService;
 
     @Autowired
     private ISubirFicheroService subirFicheroService;
@@ -105,6 +110,17 @@ public class CochesController {
     }
 
     /**
+     * Metodo para retornar todos los modelos segun la marca
+     *
+     * @return Modelos de la marca
+     */
+    @GetMapping("coches/modelospormarca/idmarca/{idmarca}")
+    public List<Modelo> findModelosPorMarca(@PathVariable Integer idmarca) {  //Peticion de tipo get
+        log.info("Buscando los modelos para la marca "+idmarca);
+        return cocheService.findAllModelosPorMarca(idmarca);
+    }
+
+    /**
      * Metodo para actualizar el numero de elementos por pagina
      *
      * @param elementsforpage Numero de elementos por pagina
@@ -114,6 +130,17 @@ public class CochesController {
         log.info("Actualizando el numero de elementos por pagina a "+ elementsforpage);
         this.elementsForPage = elementsforpage;
 //        return "Actualizando el numero de elementos por pagina a "+ elementsforpage;
+    }
+
+    /**
+     * Metodo para buscar todas las carrocerias
+     *
+     * @return Lista con todas las carrocerias
+     */
+    @GetMapping("carrocerias")
+    public List<Carroceria> findAllCarrocerias(){
+        log.info("Buscando todas las carrocerias");
+        return this.cocheService.findAllCarrocerias();
     }
 
     /**
@@ -189,18 +216,18 @@ public class CochesController {
         HttpHeaders headers = new HttpHeaders();
         try {
             resource = subirFicheroService.load(namePhoto);
+            headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + resource.getFilename() + "\"");
         } catch (MalformedURLException e) {
             e.printStackTrace();
         }
-        headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + resource.getFilename() + "\"");
         return new ResponseEntity<>(resource, HttpStatus.OK);
 
     }
 
     /**
-     * Metodo para obtener los logos de las marcas
+     * Metodo para obtener el logo de las marca
      *
-     * @return Logos de las marcas
+     * @return Logo de la marca
      */
     @GetMapping("img/marcaslogo/{idMarca}")
     public ResponseEntity<?> showLogos(@PathVariable int idMarca) {
@@ -219,8 +246,27 @@ public class CochesController {
 
     /**
      * *****************************************************************************************************************
+     *                                                 Filtros
+     * *****************************************************************************************************************
+     */
+
+    @PostMapping("coches/filtros/page/{page}")
+    public List<Modelo> filtrar(@PathVariable Integer page, @RequestBody Object filtros){
+        log.info("Estamos filtrando");
+        Matcher mat = Pattern.compile("\\{(.*?)}").matcher(filtros.toString());
+        return this.cocheService.findAllModelosFiltrados(PageRequest.of(page, elementsForPage), this.filtrosService.estructurarFiltros(mat));
+    }
+
+    /**
+     * *****************************************************************************************************************
      *                                                 Gestion
      * *****************************************************************************************************************
+     */
+    /**
+     * Metodo para
+     *
+     * @param idCarroceria Id de la carroceria a gestionar
+     * @return
      */
 
     @GetMapping("coches/generardatos/volumen/carroceria/{idCarroceria}")
