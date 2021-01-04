@@ -9,11 +9,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 public interface IModeloDAO extends JpaRepository<Modelo, Integer> {
-    Page<Modelo> findAllByMarca_IdMarca(Pageable pageable,int idMarca);
-//    List<Modelo> findAllByIdModelo(List<Integer> idModelo);
+    Page<Modelo> findAllByMarca_IdMarca(Pageable pageable, int idMarca);
+
+    //    List<Modelo> findAllByIdModelo(List<Integer> idModelo);
     List<Modelo> findAllByMarca_IdMarca(int idMarca);
 
-     List<Modelo> findAllByIdModeloIn(List<Integer> modelos);
+    List<Modelo> findAllByIdModeloIn(List<Integer> modelos);
 //    Page<Modelo> findAllByMarca_IdMarca(Pageable page,Iterable<Integer> idMarca);
 //    List<Modelo> findAllById(Pageable pageable, Iterable<Integer> var1);
 }

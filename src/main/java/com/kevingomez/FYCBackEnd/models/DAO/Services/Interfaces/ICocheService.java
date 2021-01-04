@@ -25,5 +25,4 @@ public interface ICocheService {
     Coche generateDataVolumenCarroceria(int idCarroceria);
     Resource getMarcaLogo(int idMarca);
     List<Carroceria> findAllCarrocerias();
-    List<Modelo> findAllModelosFiltrados(Pageable pageable, Filter filtros);
 }

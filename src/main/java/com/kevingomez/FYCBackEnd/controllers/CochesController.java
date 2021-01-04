@@ -251,10 +251,10 @@ public class CochesController {
      */
 
     @PostMapping("coches/filtros/page/{page}")
-    public List<Modelo> filtrar(@PathVariable Integer page, @RequestBody Object filtros){
+    public Page<Modelo> filtrar(@PathVariable Integer page, @RequestBody Object filtros){
         log.info("Estamos filtrando");
         Matcher mat = Pattern.compile("\\{(.*?)}").matcher(filtros.toString());
-        return this.cocheService.findAllModelosFiltrados(PageRequest.of(page, elementsForPage), this.filtrosService.estructurarFiltros(mat));
+        return this.filtrosService.filtrarModelos(PageRequest.of(page, elementsForPage), this.filtrosService.estructurarFiltros(mat));
     }
 
     /**

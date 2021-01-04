@@ -41,8 +41,6 @@ public class CocheService implements ICocheService {
     private IMotorCombustionDAO motorCombustionDAO;
     @Autowired
     private IMotorElectricoDAO motorElectricoDAO;
-    @Autowired
-    private IFiltrosService filtrosService;
 
     private static Logger log = LoggerFactory.getLogger(CocheService.class);
 
@@ -80,33 +78,6 @@ public class CocheService implements ICocheService {
         return carroceriaDAO.findAll();
     }
 
-    /**
-     * Metodo para buscar los coches segun los filtros estipulados
-     *
-     * @param filtros Filtros de coche que queremos
-     * @return Pagina con los coches
-     */
-    @Override
-    @Transactional(readOnly = true) //Select solo de lectura
-    public List<Modelo> findAllModelosFiltrados(Pageable pageable, Filter filtros) {
-        return this.filtrosService.filtrarModelos(filtros);
-
-//        Carroceria c = this.carroceriaDAO.getCarroceriaByCarroceria(filtros.getCarroceria().getCarroceria());
-//        List<Coche> coches = this.cocheDAO.findAllModeloDistinctByCarroceria_IdCarroceria(c.getIdCarroceria());
-//        ArrayList<Integer> modelos = new ArrayList<>();
-//        for (Coche coche: coches) {
-//            if(!modelos.contains(coche.getModelo().getIdModelo())){
-//                System.out.println(coche.getModelo().getIdModelo());
-//                modelos.add(coche.getModelo().getIdModelo());
-//            }
-//        }
-//
-//        List<Modelo> mod = this.modeloDAO.findAllByIdModeloIn(modelos);
-
-    }
-
-
-
 
     /**
      * Metodo para retornar un coche segun su id
@@ -121,6 +92,7 @@ public class CocheService implements ICocheService {
         return cocheDAO.findById(id).orElse(null);
     }
 
+
     /**
      * Metodo para retornar una pagina con coches
      *
@@ -133,6 +105,7 @@ public class CocheService implements ICocheService {
         // Lo retorna si lo encuentra y en caso contrario retorna null
         return cocheDAO.findAll(pageable);
     }
+
 
     /**
      * Metodo para retornar una pagina con modelos
@@ -148,6 +121,7 @@ public class CocheService implements ICocheService {
         return modeloDAO.findAll(pageable);
     }
 
+
     /**
      * Metodo para retornar una pagina con modelos segun la marca especificada
      *
@@ -161,6 +135,7 @@ public class CocheService implements ICocheService {
         return modeloDAO.findAllByMarca_IdMarca(pageable, idMarca);
     }
 
+
     /**
      * Metodo para retornar todos los modelos segun la marca especificada
      *
@@ -173,6 +148,7 @@ public class CocheService implements ICocheService {
         return modeloDAO.findAllByMarca_IdMarca(idMarca);
     }
 
+
     /**
      * Metodo para retornar todos los motores de combustion
      *
@@ -183,6 +159,7 @@ public class CocheService implements ICocheService {
     public List<MotorCombustion> findAllMotorCombustion() {
         return motorCombustionDAO.findAll();
     }
+
 
     /**
      * Metodo para retornar un motor de combustion segun su id
@@ -197,6 +174,7 @@ public class CocheService implements ICocheService {
         return motorCombustionDAO.findById(id).orElse(null);
     }
 
+
     /**
      * Metodo para retornar todos los motores de combustion
      *
@@ -207,6 +185,7 @@ public class CocheService implements ICocheService {
     public List<MotorElectrico> findAllMotorElectrico() {
         return motorElectricoDAO.findAll();
     }
+
 
     /**
      * Metodo para retornar un motor de combustion segun su id
@@ -220,6 +199,7 @@ public class CocheService implements ICocheService {
         // Lo retorna si lo encuentra y en caso contrario retorna null
         return motorElectricoDAO.findById(id).orElse(null);
     }
+
 
     @Override
     @Transactional(readOnly = true) //Select solo de lectura
