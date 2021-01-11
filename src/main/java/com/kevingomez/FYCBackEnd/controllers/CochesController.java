@@ -278,6 +278,7 @@ public class CochesController {
     @GetMapping("coches/generardatos/volumen/carroceria/{idCarroceria}")
     public Coche generateDataVolumenCarroceria(@PathVariable int idCarroceria){
         log.info("Generando datos de volumen para idCarroceria: "+idCarroceria);
-        return cocheService.generateDataVolumenCarroceria(idCarroceria);
+//        return cocheService.generateDataVolumenCarroceria(idCarroceria);
+        return null;
     }
 }
