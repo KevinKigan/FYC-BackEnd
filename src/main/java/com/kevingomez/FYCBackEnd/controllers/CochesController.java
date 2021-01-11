@@ -142,6 +142,11 @@ public class CochesController {
         log.info("Buscando todas las carrocerias");
         return this.cocheService.findAllCarrocerias();
     }
+    @PostMapping("carrocerias")
+    public List<Carroceria> findAllCarrocerias(@RequestBody Object a){
+        log.info("Buscando todas las carrocerias");
+        return this.cocheService.findAllCarrocerias();
+    }
 
     /**
      * *****************************************************************************************************************
@@ -252,7 +257,8 @@ public class CochesController {
 
     @PostMapping("coches/filtros/page/{page}")
     public Page<Modelo> filtrar(@PathVariable Integer page, @RequestBody Object filtros){
-        log.info("Estamos filtrando");
+        log.info("Comenzamos a filtrar");
+        log.info("----------------------------------");
         Matcher mat = Pattern.compile("\\{(.*?)}").matcher(filtros.toString());
         return this.filtrosService.filtrarModelos(PageRequest.of(page, elementsForPage), this.filtrosService.estructurarFiltros(mat));
     }

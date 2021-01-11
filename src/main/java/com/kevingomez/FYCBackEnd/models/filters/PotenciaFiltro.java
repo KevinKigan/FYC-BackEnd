@@ -2,17 +2,27 @@ package com.kevingomez.FYCBackEnd.models.filters;
 
 public class PotenciaFiltro {
     private static final String titulo = "potencia";
-    private int potencia;
+    private int potenciaMin;
+    private int potenciaMax;
+
 
     public static String getTitulo() {
         return titulo;
     }
 
-    public int getPotencia() {
-        return potencia;
+    public int getPotenciaMin() {
+        return potenciaMin;
     }
 
-    public void setPotencia(int potencia) {
-        this.potencia = potencia;
+    public void setPotenciaMin(int potenciaMin) {
+        this.potenciaMin = potenciaMin;
+    }
+
+    public int getPotenciaMax() {
+        return potenciaMax;
+    }
+
+    public void setPotenciaMax(int potenciaMax) {
+        this.potenciaMax = potenciaMax;
     }
 }

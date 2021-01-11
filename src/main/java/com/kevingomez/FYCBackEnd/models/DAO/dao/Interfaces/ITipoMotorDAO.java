@@ -9,4 +9,5 @@ import java.util.List;
 
 public interface ITipoMotorDAO extends JpaRepository<TipoMotor, Integer> {
     List<TipoMotor> findAllByMotorCombustionIn(List<MotorCombustion> idsMotorCombustion);
+    List<TipoMotor> findAllByMotorCombustion_IdMotorCombustionIn(List<Integer> idsMotorCombustion);
 }

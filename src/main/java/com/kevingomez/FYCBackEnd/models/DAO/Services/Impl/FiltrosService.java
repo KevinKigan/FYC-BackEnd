@@ -29,7 +29,9 @@ public class FiltrosService implements IFiltrosService {
     @Autowired
     private IEmisionesDAO emisionesDAO;
     @Autowired
-    private IMotoresCombustionDAO motoresCombustionDAO;
+    private IMotorCombustionDAO motorCombustionDAO;
+    @Autowired
+    private ISobrealimentacionDAO sobrealimentacionDAO;
     @Autowired
     private ITipoMotorDAO tipoMotorDAO;
     @Autowired
@@ -45,6 +47,12 @@ public class FiltrosService implements IFiltrosService {
     private static final Logger log = LoggerFactory.getLogger(FiltrosService.class);
     private static final double MAXIMO_CONSUMO = 10000.0;
     private static final int MAXIMO_EMISIONES = 1000000;
+    private static final int MINIMO_POTENCIA = -1;
+    private static final int MAXIMO_POTENCIA = 1000000;
+    private static final String CUALQUIERA = "cualquiera";
+    private static final String TURBO = "turbo";
+    private static final String SUPERCARGADOR = "supercargador";
+    private static final String NINGUNO = "ninguno";
 
 
     /**
@@ -94,8 +102,19 @@ public class FiltrosService implements IFiltrosService {
         for (String parte : partes) {
             String parametro = parte.split("=")[0];
             String valor = parte.split("=")[1];
-            if (parametro.equals("potencia")) {
-                potenciaFiltro.setPotencia(Integer.parseInt(valor));
+            if (parametro.equals("potenciamin")) {
+                if (valor.equals(CUALQUIERA)) {
+                    potenciaFiltro.setPotenciaMin(MINIMO_POTENCIA);
+                } else {
+                    potenciaFiltro.setPotenciaMin(Integer.parseInt(valor));
+                }
+            }
+            if (parametro.equals("potenciamax")) {
+                if (valor.equals(CUALQUIERA)) {
+                    potenciaFiltro.setPotenciaMax(MAXIMO_POTENCIA);
+                } else {
+                    potenciaFiltro.setPotenciaMax(Integer.parseInt(valor));
+                }
             }
         }
         filter.setPotencia(potenciaFiltro);
@@ -113,7 +132,7 @@ public class FiltrosService implements IFiltrosService {
             String parametro = parte.split("=")[0];
             String valor = parte.split("=")[1];
             if (parametro.equals("emisiones")) {
-                if (valor.equals("cualquiera")) {
+                if (valor.equals(CUALQUIERA)) {
                     emisionesFiltro.setEmisiones(MAXIMO_EMISIONES);
                 } else {
                     emisionesFiltro.setEmisiones(Integer.parseInt(valor));
@@ -138,21 +157,21 @@ public class FiltrosService implements IFiltrosService {
             String valor = parte.split("=")[1];
             switch (parametro) {
                 case "autopista":
-                    if (valor.equals("Cualquiera")) {
+                    if (valor.equals(CUALQUIERA)) {
                         consumoFiltro.setAutopista(MAXIMO_CONSUMO);
                     } else {
                         consumoFiltro.setAutopista(Double.parseDouble(valor));
                     }
                     break;
                 case "mixto":
-                    if (valor.equals("Cualquiera")) {
+                    if (valor.equals(CUALQUIERA)) {
                         consumoFiltro.setMixto(MAXIMO_CONSUMO);
                     } else {
                         consumoFiltro.setMixto(Double.parseDouble(valor));
                     }
                     break;
                 case "ciudad":
-                    if (valor.equals("Cualquiera")) {
+                    if (valor.equals(CUALQUIERA)) {
                         consumoFiltro.setCiudad(MAXIMO_CONSUMO);
                     } else {
                         consumoFiltro.setCiudad(Double.parseDouble(valor));
@@ -194,19 +213,21 @@ public class FiltrosService implements IFiltrosService {
             String valor = parte.split("=")[1];
             switch (parametro) {
                 case "cilindrada":
-                    motorFiltro.setCilindrada(valor);
+                    if(valor.equals(CUALQUIERA)){
+                        motorFiltro.setCilindrada(-1.0);
+                    }else {
+                        motorFiltro.setCilindrada(Double.parseDouble(valor));
+                    }
                     break;
                 case "cilindros":
-                    motorFiltro.setCilindros(Integer.parseInt(valor));
+                    if(valor.equals(CUALQUIERA)){
+                        motorFiltro.setCilindros(-1);
+                    }else {
+                        motorFiltro.setCilindros(Integer.parseInt(valor));
+                    }
                     break;
                 case "sobrealimentacion":
                     motorFiltro.setSobrealimentacion(valor);
-                    break;
-                case "combustible":
-                    motorFiltro.setCombustible(valor);
-                    break;
-                case "emisiones":
-                    motorFiltro.setEmisiones(valor);
                     break;
             }
         }
@@ -289,6 +310,14 @@ public class FiltrosService implements IFiltrosService {
      */
     private void filtrarPotencia(PotenciaFiltro potencia) {
 
+        modelosList = reinicializarModelos(eliminarDuplicados(
+            this.cocheDAO.findAllByTipoMotorIn(                                 // Buscamos los coches que tengas los tipos de motores
+                this.tipoMotorDAO.findAllByMotorCombustionIn(                   // Buscamos los tipos de motores que tengan los motores
+                    this.motorCombustionDAO.findAllByHpIsLessThanEqualAndHpIsGreaterThanEqual(
+                        potencia.getPotenciaMin(), potencia.getPotenciaMax())   // Buscamos por potencia
+                )
+            )
+        ));
     }
 
     /**
@@ -297,8 +326,57 @@ public class FiltrosService implements IFiltrosService {
      * @param motor
      */
     private void filtrarMotor(MotorFiltro motor) {
+        List<MotorCombustion> cilindros = new ArrayList<>(), cilindrada = new ArrayList<>();
+        if(motor.getCilindros()>0) {
+            cilindros = this.motorCombustionDAO.findAllByCilindros(motor.getCilindros());
+        }
+        if(motor.getCilindrada()>0) {
+            cilindrada = this.motorCombustionDAO.findAllByCilindrada(motor.getCilindrada());
+        }
+        List<Sobrealimentacion> sobrealimentacion = new ArrayList<>();
+        if(motor.getSobrealimentacion().contains(TURBO) && motor.getSobrealimentacion().contains(SUPERCARGADOR)){
+            sobrealimentacion = this.sobrealimentacionDAO.findAllByTurboAndSupercargador(true, true);
+        }else if(motor.getSobrealimentacion().contains(TURBO)){
+            sobrealimentacion = this.sobrealimentacionDAO.findAllByTurbo(true);
+        }else if(motor.getSobrealimentacion().contains(SUPERCARGADOR)){
+            sobrealimentacion = this.sobrealimentacionDAO.findAllBySupercargador(true);
+        }else if(motor.getSobrealimentacion().contains(NINGUNO)){
+            sobrealimentacion = this.sobrealimentacionDAO.findAllByTurboAndSupercargador(false, false);
+        }
 
+        ArrayList<Integer> idsCoincidentes = new ArrayList<>();
+        if(!cilindrada.isEmpty() && cilindros.isEmpty()){
+            for (MotorCombustion mc: cilindrada) {
+                idsCoincidentes.add(mc.getIdMotorCombustion());
+            }
+        } else if(cilindrada.isEmpty() && !cilindros.isEmpty()){
+            for (MotorCombustion mc: cilindros) {
+                idsCoincidentes.add(mc.getIdMotorCombustion());
+            }
+        } else {
+            idsCoincidentes = buscarCoincidenciasMC(cilindros, cilindrada);
+        }
+        if(!sobrealimentacion.isEmpty()){
+            ArrayList<Integer> listaIdSobrealimentacion = new ArrayList<>();
+            for (Sobrealimentacion sobre: sobrealimentacion) {
+                listaIdSobrealimentacion.add(sobre.getIdSobrealimentacion());
+            }
+            modelosList = reinicializarModelos(eliminarDuplicados(
+                this.cocheDAO.findAllByTipoMotorIn(
+                    this.tipoMotorDAO.findAllByMotorCombustion_IdMotorCombustionIn(
+                        buscarCoincidenciasInt(idsCoincidentes,listaIdSobrealimentacion)
+                    )
+                )
+            ));
+        }else{
+            modelosList = reinicializarModelos(eliminarDuplicados(
+                this.cocheDAO.findAllByTipoMotorIn(
+                    this.tipoMotorDAO.findAllByMotorCombustion_IdMotorCombustionIn(idsCoincidentes)
+                )
+            ));
+        }
     }
+
 
     /**
      * Metodo real de filtrado de emisiones
@@ -308,7 +386,7 @@ public class FiltrosService implements IFiltrosService {
     private void filtrarEmisiones(EmisionesFiltro emisiones) {
         List<Emisiones> emisionesList = this.emisionesDAO.findAllByCO2IsLessThanEqual(emisiones.getEmisiones());
         List<Emisiones> tipoEmisionesList = new ArrayList<>();
-        if(!emisiones.getTipoEmisiones().equals("cualquiera")) tipoEmisionesList = this.emisionesDAO.
+        if(!emisiones.getTipoEmisiones().equals(CUALQUIERA)) tipoEmisionesList = this.emisionesDAO.
                 findAllByTipoEmisones_IdTipoEmisiones(
                   this.tipoEmisionesDAO.findByTipoEmisiones(emisiones.getTipoEmisiones())
                   .getIdTipoEmisiones()
@@ -316,7 +394,7 @@ public class FiltrosService implements IFiltrosService {
         modelosList = reinicializarModelos(eliminarDuplicados(
             this.cocheDAO.findAllByTipoMotorIn(                                 // Buscamos los coches que tengas los tipos de motores
                 this.tipoMotorDAO.findAllByMotorCombustionIn(                   // Buscamos los tipos de motores que tengan los motores
-                    this.motoresCombustionDAO.findAllByEmisiones_IdEmisionesIn( // Buscamos los motores que coincidan con las emisiones
+                    this.motorCombustionDAO.findAllByEmisiones_IdEmisionesIn( // Buscamos los motores que coincidan con las emisiones
                          buscarCoincidencias(emisionesList, tipoEmisionesList)
                     )
                 )
@@ -468,6 +546,39 @@ public class FiltrosService implements IFiltrosService {
         return listaIdsConicidentes;
     }
 
+    private ArrayList<Integer> buscarCoincidenciasInt(ArrayList<Integer> idsLista1, ArrayList<Integer> idsLista2) {
+        ArrayList<Integer> coincidentes = new ArrayList<>();
+        for (int id: idsLista1) {
+            if(idsLista2.contains(id)) coincidentes.add(id);
+        }
+        return coincidentes;
+    }
+
+    /**
+     *
+     * @param cilindros  Lista con los motores que tienen los cilindros buscados
+     * @param cilindrada Lista con los motores que tienen la cilindrada buscada
+     * @return
+     */
+    private ArrayList<Integer> buscarCoincidenciasMC(List<MotorCombustion> cilindros, List<MotorCombustion> cilindrada) {
+        ArrayList<Integer> listaIdsConicidentes = new ArrayList<>();
+        List<MotorCombustion> listaSmall;
+        List<MotorCombustion> listaBig;
+        if(cilindros.size()<=cilindrada.size()){
+            listaSmall = cilindros;
+            listaBig = cilindrada;
+        }else{
+            listaSmall = cilindrada;
+            listaBig = cilindros;
+        }
+        for (MotorCombustion motor: listaSmall) {
+            if(listaBig.contains(motor)){
+                listaIdsConicidentes.add(motor.getIdMotorCombustion());
+            }
+        }
+        return listaIdsConicidentes;
+    }
+
     /**
      * Metodo para obtener los ids de consumo y
      * añadirlos a un array
@@ -539,5 +650,16 @@ public class FiltrosService implements IFiltrosService {
 //        "title": "emisiones",
 //        "emisiones": "400",
 //        "tipo_emisiones": "Euro 6"
+//        },
+//        {
+//        "title": "motor",
+//        "cilindrada": "2",
+//        "cilindros": "6",
+//        "sobrealimentacion": "turbo"
+//        },
+//        {
+//        "title": "potencia",
+//        "potenciamin": "300",
+//        "potenciamax": "400"
 //        }
-//]
+//        ]
