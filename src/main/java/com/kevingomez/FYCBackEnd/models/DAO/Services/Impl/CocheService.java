@@ -1,10 +1,8 @@
 package com.kevingomez.FYCBackEnd.models.DAO.Services.Impl;
 
 import com.kevingomez.FYCBackEnd.models.DAO.Services.Interfaces.ICocheService;
-import com.kevingomez.FYCBackEnd.models.DAO.Services.Interfaces.IFiltrosService;
 import com.kevingomez.FYCBackEnd.models.DAO.dao.Interfaces.*;
 import com.kevingomez.FYCBackEnd.models.entity.*;
-import com.kevingomez.FYCBackEnd.models.filters.Filter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -203,7 +201,7 @@ public class CocheService implements ICocheService {
 
     @Override
     @Transactional(readOnly = true) //Select solo de lectura
-    public Coche generateDataVolumenCarroceria(int idCarroceria) {
+    public ArrayList<Double> generateDataVolumenCarroceria(int idCarroceria) {
         // Busca todos los coches con la carroceria especificada
         List<Coche> coches = cocheDAO.findAllModeloDistinctByCarroceria_IdCarroceria(idCarroceria);
         List<Coche> cochesAux = new ArrayList<>();
@@ -264,15 +262,24 @@ public class CocheService implements ICocheService {
         double mediaHabitaculoH = round(volHHabitaculo.updateAndGet(aDouble -> aDouble / elementosH.doubleValue()) * 100);
         mediaHabitaculoH /= 100;
 
-        for (int i = 0; i < idVolumenes.size(); i++) {
+        ArrayList<Double> medias = new ArrayList<>();
+        medias.add(mediaMaletero2p);
+        medias.add(mediaHabitaculo2p);
+        medias.add(mediaMaletero4p);
+        medias.add(mediaHabitaculo4p);
+        medias.add(mediaMaleteroH);
+        medias.add(mediaHabitaculoH);
+        return medias;
 
-        }
-//        //Dame todos los volumenes que coinciden con esoso volumenes_id
-//        System.out.println(coches);
-        List<Volumen> vols = volumenDAO.findAll();// vol = volumenDAO.findById(idVolumenes.get(0)).orElse(null);
-        List<Volumen> volumenes = volumenDAO.findAllById(idVolumenes);
-        System.out.println(vols.get(0).getVolumen4p().getVolumenHabitaculo());
-        return coches.get(0);
+//        for (int i = 0; i < idVolumenes.size(); i++) {
+//
+//        }
+////        //Dame todos los volumenes que coinciden con esoso volumenes_id
+////        System.out.println(coches);
+//        List<Volumen> vols = volumenDAO.findAll();// vol = volumenDAO.findById(idVolumenes.get(0)).orElse(null);
+//        List<Volumen> volumenes = volumenDAO.findAllById(idVolumenes);
+//        System.out.println(vols.get(0).getVolumen4p().getVolumenHabitaculo());
+//        return coches.get(0);
     }
 
     /**

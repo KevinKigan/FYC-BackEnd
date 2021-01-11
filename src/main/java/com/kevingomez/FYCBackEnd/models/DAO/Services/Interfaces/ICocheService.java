@@ -1,14 +1,12 @@
 package com.kevingomez.FYCBackEnd.models.DAO.Services.Interfaces;
 
 import com.kevingomez.FYCBackEnd.models.entity.*;
-import com.kevingomez.FYCBackEnd.models.filters.Filter;
 import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
-import java.net.MalformedURLException;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Matcher;
 
 public interface ICocheService {
     List<Coche> findAllCoches();
@@ -22,7 +20,7 @@ public interface ICocheService {
     Page<Modelo> findAllModelosPorMarca(Pageable pageable, int idMarca);
     List<Modelo> findAllModelosPorMarca(int idMarca);
     List<Marca> findAllMarcas();
-    Coche generateDataVolumenCarroceria(int idCarroceria);
+    ArrayList generateDataVolumenCarroceria(int idCarroceria);
     Resource getMarcaLogo(int idMarca);
     List<Carroceria> findAllCarrocerias();
 }
