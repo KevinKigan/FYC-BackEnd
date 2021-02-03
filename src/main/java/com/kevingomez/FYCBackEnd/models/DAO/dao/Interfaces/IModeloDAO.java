@@ -15,6 +15,7 @@ public interface IModeloDAO extends JpaRepository<Modelo, Integer> {
     List<Modelo> findAllByMarca_IdMarca(int idMarca);
 
     List<Modelo> findAllByIdModeloIn(List<Integer> modelos);
+    Modelo findByModeloAndMarca_MarcaCoche(String modelo, String marca);
 //    Page<Modelo> findAllByMarca_IdMarca(Pageable page,Iterable<Integer> idMarca);
 //    List<Modelo> findAllById(Pageable pageable, Iterable<Integer> var1);
 }

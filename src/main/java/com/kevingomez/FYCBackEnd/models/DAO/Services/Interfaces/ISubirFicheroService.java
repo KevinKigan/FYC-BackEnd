@@ -7,5 +7,5 @@ import java.nio.file.Path;
 
 public interface ISubirFicheroService {
     Resource load(String nameImage) throws MalformedURLException;
-    Path getPath(String nameImage);
+//    Path getPath(String nameImage);
 }

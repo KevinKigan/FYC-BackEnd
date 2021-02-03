@@ -17,8 +17,8 @@ import java.nio.file.Paths;
 public class SubirFicheroService implements ISubirFicheroService {
     private static Logger log = LoggerFactory.getLogger(SubirFicheroService.class);
 
-    @Value("${images.logo}")
-    private String LOGO_DIR;
+//    @Value("${images.logo}")
+//    private String LOGO_DIR;
 
     @Override
     public Resource load(String nameImage) throws MalformedURLException {
@@ -31,8 +31,8 @@ public class SubirFicheroService implements ISubirFicheroService {
         return resource;
     }
 
-    @Override
-    public Path getPath(String nameImage) {
-        return Paths.get(LOGO_DIR).resolve(nameImage).toAbsolutePath();
-    }
+//    @Override
+//    public Path getPath(String nameImage) {
+//        return Paths.get(LOGO_DIR).resolve(nameImage).toAbsolutePath();
+//    }
 }

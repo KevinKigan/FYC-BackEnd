@@ -17,7 +17,7 @@ public class SpringJobs {
     ICocheService cocheService;
     private static final Logger log = LoggerFactory.getLogger(SpringJobs.class);
 
-    @Scheduled(cron = "0 0/2 * 1/1 * ?")
+    @Scheduled(cron = "0 0/10 * 1/1 * ?")
 //    @Scheduled(cron = "${jobs.tarea1}")
     public void calcularVolumenes() {
         log.info("Empezando Job Calcular Volumenes " + System.currentTimeMillis() / 1000);

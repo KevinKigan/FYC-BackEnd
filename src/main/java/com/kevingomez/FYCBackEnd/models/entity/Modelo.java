@@ -20,8 +20,11 @@ public class Modelo  implements Serializable {
     @JsonIgnoreProperties(value={"modelo","hibernateLazyInitializer","handler"}, allowSetters = true)
     private Marca marca;
 
-    @NotNull(message = "La modelo no puede estar vacio")
+    @NotNull(message = "El modelo no puede estar vacio")
     private String modelo;
+
+    @NotNull(message = "La imagen no puede estar vacia")
+    private String imagen;
 
     @OneToOne(fetch = FetchType.LAZY) // Un coche tiene un volumen
     @JoinColumn(name = "volumen_id")
@@ -61,4 +64,11 @@ public class Modelo  implements Serializable {
         this.modelo = modelo;
     }
 
+    public String getImagen() {
+        return imagen;
+    }
+
+    public void setImagen(String imagen) {
+        this.imagen = imagen;
+    }
 }
