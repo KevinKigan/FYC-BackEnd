@@ -11,6 +11,7 @@ import java.util.List;
 public interface IConsumoDAO extends JpaRepository<Consumo, Integer> {
 //    List<Consumo> findAllByConsumoIsGreaterThanEqualAndPrecioIsLessThanEqual(int precioMin, int precioMax);
     List<Consumo> findAllByIdConsumoNormalIn(List<ConsumoNormal> idConsumoNormal);
+    List<Consumo> findAllByIdConsumoIn(List<Integer> idsConsumo);
 
 //    List<Consumo> findAllByIdConsumoNormalIn(List<Integer> consumosNormales);
 //    List<Consumo> findAllByIdConsumoNormalInAndIdConsumoAlternativo(List<Integer> consumosNormales, List<Integer> consumosAlt);

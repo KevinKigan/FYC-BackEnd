@@ -1,5 +1,6 @@
 package com.kevingomez.FYCBackEnd.controllers;
 
+import com.kevingomez.FYCBackEnd.models.DAO.Services.Impl.UploadFileService;
 import com.kevingomez.FYCBackEnd.models.DAO.Services.Interfaces.ICocheService;
 import com.kevingomez.FYCBackEnd.models.DAO.Services.Interfaces.IFiltrosService;
 import com.kevingomez.FYCBackEnd.models.DAO.Services.Interfaces.ISubirFicheroService;
@@ -8,6 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
+import org.springframework.dao.DataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -36,21 +38,25 @@ public class CochesController {
     @Autowired
     private ISubirFicheroService subirFicheroService;
 
+    @Autowired
+    private UploadFileService uploadFileService;
+
     /**
      * *****************************************************************************************************************
      *                                                      Coches
      * *****************************************************************************************************************
      */
 
+    //TODO este metodo nose usa
     /**
      * Metodo para retornar todos los coches
      *
      * @return Lista de Coches
      */
-    @GetMapping("coches")
-    public List<Coche> indexCoches() {  //Peticion de tipo get
-        log.info("Buscando todos los coches");
-        return cocheService.findAllCoches();
+    @GetMapping("coches/modelo/{idModelo}")
+    public List<Coche> getCochesByModelo(@PathVariable int idModelo) {  //Peticion de tipo get
+        log.info("Buscando todos los coches con el modelo id "+idModelo);
+        return cocheService.findAllCocheByIdModelo(idModelo);
     }
 
     /**
@@ -58,7 +64,7 @@ public class CochesController {
      *
      * @return Lista de Marcas
      */
-    @GetMapping("coches/marcas")
+    @GetMapping("modelos/marcas")
     public List<Marca> indexMarcas() {  //Peticion de tipo get
         log.info("Buscando todos las marcas");
         return cocheService.findAllMarcas();
@@ -75,7 +81,65 @@ public class CochesController {
         log.info("Buscando coche con id "+id);
         return cocheService.findCocheById(id);
     }
+    /**
+     * Metodo para obtener la foto del modelo
+     *
+     * @param namePhoto
+     * @return
+     */
+    @GetMapping("modelos/imagen/{namePhoto:.+}")
+    // :.+ Indica que la foto tiene un nombre y una extension que puede ser cualquiera
+    public ResponseEntity<Resource> showPhoto(@PathVariable String namePhoto) {
+        Resource resource = null;
+        log.info("Buscando imagen de modelo "+namePhoto);
+        HttpHeaders headers = new HttpHeaders();
+        try {
+            resource = uploadFileService.loadModelo(namePhoto);
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        }
+        headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + resource.getFilename() + "\"");
+        return new ResponseEntity<>(resource, headers, HttpStatus.OK);
 
+    }
+
+    @PostMapping("modelos/precios")
+    public HashMap<String, String> preciosModelos(@RequestBody List<Integer> idsModelos) {  //Peticion de tipo get
+        log.info("Buscando todos los precios de los coches segun la lista de modelos");
+        return cocheService.findAllPreciosList(idsModelos);
+    }
+
+    /**
+     * Metodo para retornar el modelo segun el id especificado
+     *
+     * @param id ID del modelo
+     * @return Modelo con el id espeficicado
+     */
+    @GetMapping("modelo/{id}")
+    public ResponseEntity<?> getModeloById(@PathVariable int id) {  //Peticion de tipo get
+        log.info("Buscando modelo con id "+id);
+        Modelo modelo;
+        Map<String, Object> response = new HashMap<>();
+        try {
+            modelo = cocheService.findModeloById(id);
+            if(modelo.getImagen().equals("")){
+                modelo.setImagen("defaultImage.jpg");
+            }
+        } catch (DataAccessException e) {
+            response.put("mensaje", "Error al realizar la consulta en la base de datos");
+            response.put("error", e.getMostSpecificCause().getMessage());
+            response.put("errorEspecifico", e.getMessage().concat(": ").concat(e.getMostSpecificCause().getMessage()));
+            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+        if (modelo == null) {
+            response.put("mensaje", "El modelo ID: ".concat(Integer.toString(id).concat(" no existe en la base de datos")));
+            return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
+        }
+        return new ResponseEntity<>(modelo, HttpStatus.OK);
+    }
+
+    //TODO este metodo no se usa
     /**
      * Metodo para retornar una pagina con un numero de coches
      *
@@ -92,7 +156,7 @@ public class CochesController {
      *
      * @return Pagina de modelos
      */
-    @GetMapping("coches/modelos/page/{page}")
+    @GetMapping("modelos/page/{page}")
     public Page<Modelo> findModelosPage(@PathVariable Integer page) {  //Peticion de tipo get
         log.info("Buscando la pagina "+page+" de modelos con "+elementsForPage+" elementos");
         return cocheService.findAllModelos(PageRequest.of(page, elementsForPage));
@@ -103,18 +167,19 @@ public class CochesController {
      *
      * @return Pagina de modelos por marcas
      */
-    @GetMapping("coches/modelospormarca/idmarca/{idmarca}/page/{page}")
+    @GetMapping("modelospormarca/idmarca/{idmarca}/page/{page}")
     public Page<Modelo> findModelosPorMarcasPage(@PathVariable Integer idmarca, @PathVariable Integer page) {  //Peticion de tipo get
         log.info("Buscando la pagina "+page+" de modelos con "+elementsForPage+" elementos para la marca "+idmarca);
         return cocheService.findAllModelosPorMarca(PageRequest.of(page, elementsForPage),idmarca);
     }
 
+    //TODO este metodo no se usa
     /**
      * Metodo para retornar todos los modelos segun la marca
      *
      * @return Modelos de la marca
      */
-    @GetMapping("coches/modelospormarca/idmarca/{idmarca}")
+    @GetMapping("modelospormarca/idmarca/{idmarca}")
     public List<Modelo> findModelosPorMarca(@PathVariable Integer idmarca) {  //Peticion de tipo get
         log.info("Buscando los modelos para la marca "+idmarca);
         return cocheService.findAllModelosPorMarca(idmarca);
@@ -150,6 +215,18 @@ public class CochesController {
 
     /**
      * *****************************************************************************************************************
+     *                                                    Consumo
+     * *****************************************************************************************************************
+     */
+
+    @PostMapping("coches/consumo")
+    public List<Consumo> findAllConsumosById(@RequestBody List<Integer>idsConsumos){
+        log.info("Buscando los consumos segun una lista de ids");
+        return this.cocheService.findAllConsumosById(idsConsumos);
+    }
+
+    /**
+     * *****************************************************************************************************************
      *                                                 Motor Combustion
      * *****************************************************************************************************************
      */
@@ -175,6 +252,17 @@ public class CochesController {
     public MotorCombustion getMotorCombustionById(@PathVariable int id) {  //Peticion de tipo get
         log.info("Buscando MotorCombustion con id "+id);
         return cocheService.findMotorCombustionById(id);
+    }
+    /**
+     * Metodo para retornar la lista de motores de combustion segun los ids especificados
+     *
+     * @param idsMotorCombustion IDS de los Motores de combustion
+     * @return Motor de combustion con el id espeficicado
+     */
+    @PostMapping("/coches/motorescombustion")
+    public List<MotorCombustion> getAllMotorCombustionByIds(@RequestBody List<Integer> idsMotorCombustion) {  //Peticion de tipo get
+        log.info("Buscando motores de combustion por lista de ids");
+        return cocheService.getAllMotorCombustionByIds(idsMotorCombustion);
     }
 
     /**
@@ -208,14 +296,14 @@ public class CochesController {
 
 
     /**
-     * Metodo para obtener la foto del coche
+     * Metodo para obtener la foto del logo
      *
      * @param namePhoto
      * @return
      */
     @GetMapping("img/logo/{namePhoto:.+}")
     // :.+ Indica que la foto tiene un nombre y una extension que puede ser cualquiera
-    public ResponseEntity<Resource> showPhoto(@PathVariable String namePhoto) {
+    public ResponseEntity<Resource> showLogo(@PathVariable String namePhoto) {
         log.info("Buscando imagen \""+namePhoto+"\"");
         Resource resource = null;
         HttpHeaders headers = new HttpHeaders();
@@ -226,6 +314,25 @@ public class CochesController {
             e.printStackTrace();
         }
         return new ResponseEntity<>(resource, HttpStatus.OK);
+
+    }
+    /**
+     * Metodo para obtener la foto del propietario
+     *
+     * @return
+     */
+    @GetMapping("/img/propietario")
+    public ResponseEntity<Resource> showPropietario() {
+        log.info("Buscando imagen del propietario");
+        Resource resource = null;
+        HttpHeaders headers = new HttpHeaders();
+        try {
+            resource = uploadFileService.loadPropietario();
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        }
+        headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + resource.getFilename() + "\"");
+        return new ResponseEntity<>(resource, headers, HttpStatus.OK);
 
     }
 
@@ -255,7 +362,7 @@ public class CochesController {
      * *****************************************************************************************************************
      */
 
-    @PostMapping("coches/filtros/page/{page}")
+    @PostMapping("modelos/filtros/page/{page}")
     public Page<Modelo> filtrar(@PathVariable Integer page, @RequestBody Object filtros){
         log.info("Comenzamos a filtrar");
         log.info("----------------------------------");
@@ -280,5 +387,22 @@ public class CochesController {
         log.info("Generando datos de volumen para idCarroceria: "+idCarroceria);
 //        return cocheService.generateDataVolumenCarroceria(idCarroceria);
         return null;
+    }
+
+    @GetMapping("coches/chart/{idCoche}")
+    public HashMap<String, String> getChartByIdCoche(@PathVariable int idCoche){
+        log.info("Buscamos valores de coche id "+idCoche);
+        return this.cocheService.findChartId(idCoche);
+    }
+
+    @GetMapping("coches/chartsemejantes/{idCoche}")
+    public HashMap<String, String> getChartSemejantesByIdCoche(@PathVariable int idCoche){
+        log.info("Buscamos valores medios de coches semejantes a coche id "+idCoche);
+        return this.cocheService.findChartSemejantesId(idCoche);
+    }
+
+    @GetMapping("modelo/imagen")
+    public HashMap<String,String> getChartSemejantesByIdCoche(@RequestBody HashMap<String, String> map){
+        return this.cocheService.findImagen(map.get("modelo"),map.get("marca"));
     }
 }

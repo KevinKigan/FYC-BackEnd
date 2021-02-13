@@ -14,6 +14,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.regex.Matcher;
 
@@ -49,10 +50,11 @@ public class FiltrosService implements IFiltrosService {
     private static final int MAXIMO_EMISIONES = 1000000;
     private static final int MINIMO_POTENCIA = -1;
     private static final int MAXIMO_POTENCIA = 1000000;
-    private static final String CUALQUIERA = "cualquiera";
-    private static final String TURBO = "turbo";
-    private static final String SUPERCARGADOR = "supercargador";
-    private static final String NINGUNO = "ninguno";
+    private static final String CUALQUIERA = "Cualquiera";
+    private static final String TURBO = "Turbo";
+    private static final String ATMOS = "Atmosferico";
+    private static final String SUPER = "Supercargador";
+    private static final String NINGUNO = "Ninguno";
 
 
     /**
@@ -102,14 +104,14 @@ public class FiltrosService implements IFiltrosService {
         for (String parte : partes) {
             String parametro = parte.split("=")[0];
             String valor = parte.split("=")[1];
-            if (parametro.equals("potenciamin")) {
+            if (parametro.equals("minimo")) {
                 if (valor.equals(CUALQUIERA)) {
                     potenciaFiltro.setPotenciaMin(MINIMO_POTENCIA);
                 } else {
                     potenciaFiltro.setPotenciaMin(Integer.parseInt(valor));
                 }
             }
-            if (parametro.equals("potenciamax")) {
+            if (parametro.equals("maximo")) {
                 if (valor.equals(CUALQUIERA)) {
                     potenciaFiltro.setPotenciaMax(MAXIMO_POTENCIA);
                 } else {
@@ -155,30 +157,10 @@ public class FiltrosService implements IFiltrosService {
         for (String parte : partes) {
             String parametro = parte.split("=")[0];
             String valor = parte.split("=")[1];
-            switch (parametro) {
-                case "autopista":
-                    if (valor.equals(CUALQUIERA)) {
-                        consumoFiltro.setAutopista(MAXIMO_CONSUMO);
-                    } else {
-                        consumoFiltro.setAutopista(Double.parseDouble(valor));
-                    }
-                    break;
-                case "mixto":
-                    if (valor.equals(CUALQUIERA)) {
-                        consumoFiltro.setMixto(MAXIMO_CONSUMO);
-                    } else {
-                        consumoFiltro.setMixto(Double.parseDouble(valor));
-                    }
-                    break;
-                case "ciudad":
-                    if (valor.equals(CUALQUIERA)) {
-                        consumoFiltro.setCiudad(MAXIMO_CONSUMO);
-                    } else {
-                        consumoFiltro.setCiudad(Double.parseDouble(valor));
-                    }
-                    break;
+            if (parametro.equals("value")) {
+                consumoFiltro.setMixto(Double.parseDouble(valor));
+                filter.setConsumo(consumoFiltro);
             }
-            filter.setConsumo(consumoFiltro);
         }
     }
 
@@ -201,6 +183,22 @@ public class FiltrosService implements IFiltrosService {
     }
 
     /**
+     * Metodo para comprobar si el parametro de
+     * entrada lleva tildes o no
+     *
+     * @param parametro
+     * @return
+     */
+    private String comprobarTildes(String parametro) {
+        if (parametro.contains("á")) parametro = parametro.replace("á", "a");
+        if (parametro.contains("é")) parametro = parametro.replace("é", "e");
+        if (parametro.contains("í")) parametro = parametro.replace("í", "i");
+        if (parametro.contains("ó")) parametro = parametro.replace("ó", "o");
+        if (parametro.contains("ú")) parametro = parametro.replace("ú", "u");
+        return parametro;
+    }
+
+    /**
      * Metodo para settear los strings del filtro a tipo motor
      *
      * @param partes Strings con el nombre del parametro y el valor
@@ -213,21 +211,21 @@ public class FiltrosService implements IFiltrosService {
             String valor = parte.split("=")[1];
             switch (parametro) {
                 case "cilindrada":
-                    if(valor.equals(CUALQUIERA)){
+                    if (valor.equals(CUALQUIERA)) {
                         motorFiltro.setCilindrada(-1.0);
-                    }else {
+                    } else {
                         motorFiltro.setCilindrada(Double.parseDouble(valor));
                     }
                     break;
                 case "cilindros":
-                    if(valor.equals(CUALQUIERA)){
+                    if (valor.equals(CUALQUIERA)) {
                         motorFiltro.setCilindros(-1);
-                    }else {
+                    } else {
                         motorFiltro.setCilindros(Integer.parseInt(valor));
                     }
                     break;
                 case "sobrealimentacion":
-                    motorFiltro.setSobrealimentacion(valor);
+                    motorFiltro.setSobrealimentacion(comprobarTildes(valor));
                     break;
             }
         }
@@ -309,14 +307,13 @@ public class FiltrosService implements IFiltrosService {
      * @param potencia
      */
     private void filtrarPotencia(PotenciaFiltro potencia) {
-
         modelosList = reinicializarModelos(eliminarDuplicados(
-            this.cocheDAO.findAllByTipoMotorIn(                                 // Buscamos los coches que tengas los tipos de motores
-                this.tipoMotorDAO.findAllByMotorCombustionIn(                   // Buscamos los tipos de motores que tengan los motores
-                    this.motorCombustionDAO.findAllByHpIsLessThanEqualAndHpIsGreaterThanEqual(
-                        potencia.getPotenciaMin(), potencia.getPotenciaMax())   // Buscamos por potencia
+                this.cocheDAO.findAllByTipoMotorIn(                                 // Buscamos los coches que tengas los tipos de motores
+                        this.tipoMotorDAO.findAllByMotorCombustionIn(                   // Buscamos los tipos de motores que tengan los motores
+                                this.motorCombustionDAO.findAllByHpIsGreaterThanEqualAndHpIsLessThanEqual(
+                                        potencia.getPotenciaMin(), potencia.getPotenciaMax())   // Buscamos por potencia
+                        )
                 )
-            )
         ));
     }
 
@@ -327,52 +324,55 @@ public class FiltrosService implements IFiltrosService {
      */
     private void filtrarMotor(MotorFiltro motor) {
         List<MotorCombustion> cilindros = new ArrayList<>(), cilindrada = new ArrayList<>();
-        if(motor.getCilindros()>0) {
+        boolean otrosFiltros = false;
+        if (motor.getCilindros() > 0) {
             cilindros = this.motorCombustionDAO.findAllByCilindros(motor.getCilindros());
         }
-        if(motor.getCilindrada()>0) {
+        if (motor.getCilindrada() > 0) {
             cilindrada = this.motorCombustionDAO.findAllByCilindrada(motor.getCilindrada());
         }
         List<Sobrealimentacion> sobrealimentacion = new ArrayList<>();
-        if(motor.getSobrealimentacion().contains(TURBO) && motor.getSobrealimentacion().contains(SUPERCARGADOR)){
+        if (motor.getSobrealimentacion().contains(TURBO) && motor.getSobrealimentacion().contains(SUPER)) {
             sobrealimentacion = this.sobrealimentacionDAO.findAllByTurboAndSupercargador(true, true);
-        }else if(motor.getSobrealimentacion().contains(TURBO)){
+        } else if (motor.getSobrealimentacion().contains(TURBO)) {
             sobrealimentacion = this.sobrealimentacionDAO.findAllByTurbo(true);
-        }else if(motor.getSobrealimentacion().contains(SUPERCARGADOR)){
+        } else if (motor.getSobrealimentacion().contains(SUPER)) {
             sobrealimentacion = this.sobrealimentacionDAO.findAllBySupercargador(true);
-        }else if(motor.getSobrealimentacion().contains(NINGUNO)){
+        } else if (motor.getSobrealimentacion().contains(ATMOS)) {
             sobrealimentacion = this.sobrealimentacionDAO.findAllByTurboAndSupercargador(false, false);
         }
 
         ArrayList<Integer> idsCoincidentes = new ArrayList<>();
-        if(!cilindrada.isEmpty() && cilindros.isEmpty()){
-            for (MotorCombustion mc: cilindrada) {
+        if (!cilindrada.isEmpty() && cilindros.isEmpty()) {
+            otrosFiltros = true;
+            for (MotorCombustion mc : cilindrada) {
                 idsCoincidentes.add(mc.getIdMotorCombustion());
             }
-        } else if(cilindrada.isEmpty() && !cilindros.isEmpty()){
-            for (MotorCombustion mc: cilindros) {
+        } else if (cilindrada.isEmpty() && !cilindros.isEmpty()) {
+            otrosFiltros = true;
+            for (MotorCombustion mc : cilindros) {
                 idsCoincidentes.add(mc.getIdMotorCombustion());
             }
         } else {
             idsCoincidentes = buscarCoincidenciasMC(cilindros, cilindrada);
         }
-        if(!sobrealimentacion.isEmpty()){
+        if (!sobrealimentacion.isEmpty()) {
             ArrayList<Integer> listaIdSobrealimentacion = new ArrayList<>();
-            for (Sobrealimentacion sobre: sobrealimentacion) {
+            for (Sobrealimentacion sobre : sobrealimentacion) {
                 listaIdSobrealimentacion.add(sobre.getIdSobrealimentacion());
             }
             modelosList = reinicializarModelos(eliminarDuplicados(
-                this.cocheDAO.findAllByTipoMotorIn(
-                    this.tipoMotorDAO.findAllByMotorCombustion_IdMotorCombustionIn(
-                        buscarCoincidenciasInt(idsCoincidentes,listaIdSobrealimentacion)
+                    this.cocheDAO.findAllByTipoMotorIn(
+                            this.tipoMotorDAO.findAllByMotorCombustion_IdMotorCombustionIn(
+                                    buscarCoincidenciasInt(idsCoincidentes, listaIdSobrealimentacion, otrosFiltros)
+                            )
                     )
-                )
             ));
-        }else{
+        } else {
             modelosList = reinicializarModelos(eliminarDuplicados(
-                this.cocheDAO.findAllByTipoMotorIn(
-                    this.tipoMotorDAO.findAllByMotorCombustion_IdMotorCombustionIn(idsCoincidentes)
-                )
+                    this.cocheDAO.findAllByTipoMotorIn(
+                            this.tipoMotorDAO.findAllByMotorCombustion_IdMotorCombustionIn(idsCoincidentes)
+                    )
             ));
         }
     }
@@ -386,23 +386,21 @@ public class FiltrosService implements IFiltrosService {
     private void filtrarEmisiones(EmisionesFiltro emisiones) {
         List<Emisiones> emisionesList = this.emisionesDAO.findAllByCO2IsLessThanEqual(emisiones.getEmisiones());
         List<Emisiones> tipoEmisionesList = new ArrayList<>();
-        if(!emisiones.getTipoEmisiones().equals(CUALQUIERA)) tipoEmisionesList = this.emisionesDAO.
+        if (!emisiones.getTipoEmisiones().equals(CUALQUIERA)) tipoEmisionesList = this.emisionesDAO.
                 findAllByTipoEmisones_IdTipoEmisiones(
-                  this.tipoEmisionesDAO.findByTipoEmisiones(emisiones.getTipoEmisiones())
-                  .getIdTipoEmisiones()
+                        this.tipoEmisionesDAO.findByTipoEmisiones(emisiones.getTipoEmisiones())
+                                .getIdTipoEmisiones()
                 );
         modelosList = reinicializarModelos(eliminarDuplicados(
-            this.cocheDAO.findAllByTipoMotorIn(                                 // Buscamos los coches que tengas los tipos de motores
-                this.tipoMotorDAO.findAllByMotorCombustionIn(                   // Buscamos los tipos de motores que tengan los motores
-                    this.motorCombustionDAO.findAllByEmisiones_IdEmisionesIn( // Buscamos los motores que coincidan con las emisiones
-                         buscarCoincidencias(emisionesList, tipoEmisionesList)
-                    )
+                this.cocheDAO.findAllByTipoMotorIn(                                 // Buscamos los coches que tengas los tipos de motores
+                        this.tipoMotorDAO.findAllByMotorCombustionIn(                   // Buscamos los tipos de motores que tengan los motores
+                                this.motorCombustionDAO.findAllByEmisiones_IdEmisionesIn( // Buscamos los motores que coincidan con las emisiones
+                                        buscarCoincidencias(emisionesList, tipoEmisionesList)
+                                )
+                        )
                 )
-            )
         ));
     }
-
-
 
     /**
      * Metodo real de filtrado de consumo
@@ -410,12 +408,8 @@ public class FiltrosService implements IFiltrosService {
      * @param consumo
      */
     private void filtrarConsumo(ConsumoFiltro consumo) {
-        List<Consumo> consAuto = this.consumoDAO.findAllByIdConsumoNormalIn(this.consumoNormalDAO.findAllByAutopistaIsLessThanEqual(consumo.getAutopista()));
         List<Consumo> consComb = this.consumoDAO.findAllByIdConsumoNormalIn(this.consumoNormalDAO.findAllByCombinadoIsLessThanEqual((consumo.getMixto())));
-        List<Consumo> consCiud = this.consumoDAO.findAllByIdConsumoNormalIn(this.consumoNormalDAO.findAllByCiudadIsLessThanEqual((consumo.getCiudad())));
         ArrayList<List<Consumo>> listArrayList = new ArrayList<>();
-        listArrayList.add(consAuto);
-        listArrayList.add(consCiud);
         listArrayList.add(consComb);
         ArrayList<Integer> listaConincidencias = buscarCoincidencias(listArrayList);
         modelosList = reinicializarModelos(eliminarDuplicados(this.cocheDAO.findAllByConsumo_IdConsumoIn(listaConincidencias)));
@@ -489,6 +483,47 @@ public class FiltrosService implements IFiltrosService {
     }
 
     /**
+     * Metodo para eliminar los coches duplicados
+     * y retornar los precios minimos
+     *
+     * @param coches Lista con los coches
+     * @return Lista de los modelos sin duplicar
+     */
+    public HashMap<String,String> eliminarDuplicadosCochesPreciosMinimos(List<Coche> coches) {
+        ArrayList<Integer> modelos = new ArrayList<>();
+        ArrayList<Integer> modelosAux = new ArrayList<>();
+        HashMap<String,String> precios = new HashMap<>();
+        ArrayList<String> n_a = new ArrayList<>();
+        for (Coche coche : coches) {
+            //Clave Ej: RDX/Acura
+            //Comprueba si ya se ha introducido ese modelo
+            if (precios.containsKey(coche.getModelo().getModelo()+"/"+coche.getMarca().getMarcaCoche())) {
+                //Comprueba si el modelo que ya esta introducido tiene un precio mayor al nuevo y de ser asi lo actualiza con el menor precio
+                if(Integer.parseInt(precios.get(coche.getModelo().getModelo()+"/"+coche.getMarca().getMarcaCoche()))>coche.getPrecio()) {
+                    precios.put(coche.getModelo().getModelo() + "/" + coche.getMarca().getMarcaCoche(), Integer.toString(coche.getPrecio()));
+                    // Si el precio no esta disponible (precio por defecto -1) se añade a un array para su posterior analisis
+                    if(coche.getPrecio()==-1){
+                        n_a.add(coche.getModelo().getModelo() + "/" + coche.getMarca().getMarcaCoche());
+                    }
+                }
+            } else {
+                precios.put(coche.getModelo().getModelo()+"/"+coche.getMarca().getMarcaCoche(), Integer.toString(coche.getPrecio()));
+                // Si el precio no esta disponible (precio por defecto -1) se añade a un array para su posterior analisis
+                if(coche.getPrecio()==-1){
+                    n_a.add(coche.getModelo().getModelo() + "/" + coche.getMarca().getMarcaCoche());
+                }
+            }
+        }
+        for (String key: n_a) {
+            if(precios.get(key).equals("-1")){
+                precios.put(key,"N/A");
+            }
+        }
+        return precios;
+    }
+
+
+    /**
      * Metodo para buscar las coincidencias de las emisiones en
      * los registros de CO2 y tipo de emisiones
      *
@@ -500,15 +535,15 @@ public class FiltrosService implements IFiltrosService {
         ArrayList<Integer> listaIdsConicidentes = new ArrayList<>();
         List<Emisiones> listaSmall;
         List<Emisiones> listaBig;
-        if(emisionesList.size()<=tipoEmisionesList.size()){
+        if (emisionesList.size() <= tipoEmisionesList.size()) {
             listaSmall = emisionesList;
             listaBig = tipoEmisionesList;
-        }else{
+        } else {
             listaSmall = tipoEmisionesList;
             listaBig = emisionesList;
         }
-        for (Emisiones emision: listaSmall) {
-            if(listaBig.contains(emision)){
+        for (Emisiones emision : listaSmall) {
+            if (listaBig.contains(emision)) {
                 listaIdsConicidentes.add(emision.getIdEmisiones());
             }
         }
@@ -546,16 +581,19 @@ public class FiltrosService implements IFiltrosService {
         return listaIdsConicidentes;
     }
 
-    private ArrayList<Integer> buscarCoincidenciasInt(ArrayList<Integer> idsLista1, ArrayList<Integer> idsLista2) {
+    private ArrayList<Integer> buscarCoincidenciasInt(ArrayList<Integer> idsLista1, ArrayList<Integer> idsLista2, boolean otrosFiltros) {
         ArrayList<Integer> coincidentes = new ArrayList<>();
-        for (int id: idsLista1) {
-            if(idsLista2.contains(id)) coincidentes.add(id);
+        if (otrosFiltros) {
+            for (int id : idsLista1) {
+                if (idsLista2.contains(id)) coincidentes.add(id);
+            }
+        } else {
+            coincidentes = idsLista2;
         }
         return coincidentes;
     }
 
     /**
-     *
      * @param cilindros  Lista con los motores que tienen los cilindros buscados
      * @param cilindrada Lista con los motores que tienen la cilindrada buscada
      * @return
@@ -564,15 +602,15 @@ public class FiltrosService implements IFiltrosService {
         ArrayList<Integer> listaIdsConicidentes = new ArrayList<>();
         List<MotorCombustion> listaSmall;
         List<MotorCombustion> listaBig;
-        if(cilindros.size()<=cilindrada.size()){
+        if (cilindros.size() <= cilindrada.size()) {
             listaSmall = cilindros;
             listaBig = cilindrada;
-        }else{
+        } else {
             listaSmall = cilindrada;
             listaBig = cilindros;
         }
-        for (MotorCombustion motor: listaSmall) {
-            if(listaBig.contains(motor)){
+        for (MotorCombustion motor : listaSmall) {
+            if (listaBig.contains(motor)) {
                 listaIdsConicidentes.add(motor.getIdMotorCombustion());
             }
         }
