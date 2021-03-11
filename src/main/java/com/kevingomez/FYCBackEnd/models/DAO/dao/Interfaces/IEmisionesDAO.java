@@ -1,6 +1,6 @@
 package com.kevingomez.FYCBackEnd.models.DAO.dao.Interfaces;
 
-import com.kevingomez.FYCBackEnd.models.entity.Emisiones;
+import com.kevingomez.FYCBackEnd.models.entity.Coches.Emisiones;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;

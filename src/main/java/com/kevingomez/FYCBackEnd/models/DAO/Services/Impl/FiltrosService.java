@@ -2,7 +2,7 @@ package com.kevingomez.FYCBackEnd.models.DAO.Services.Impl;
 
 import com.kevingomez.FYCBackEnd.models.DAO.Services.Interfaces.IFiltrosService;
 import com.kevingomez.FYCBackEnd.models.DAO.dao.Interfaces.*;
-import com.kevingomez.FYCBackEnd.models.entity.*;
+import com.kevingomez.FYCBackEnd.models.entity.Coches.*;
 import com.kevingomez.FYCBackEnd.models.filters.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

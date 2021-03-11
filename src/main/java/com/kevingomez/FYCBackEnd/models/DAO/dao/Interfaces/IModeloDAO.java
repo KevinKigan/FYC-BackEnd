@@ -1,11 +1,10 @@
 package com.kevingomez.FYCBackEnd.models.DAO.dao.Interfaces;
 
-import com.kevingomez.FYCBackEnd.models.entity.Modelo;
+import com.kevingomez.FYCBackEnd.models.entity.Coches.Modelo;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public interface IModeloDAO extends JpaRepository<Modelo, Integer> {
