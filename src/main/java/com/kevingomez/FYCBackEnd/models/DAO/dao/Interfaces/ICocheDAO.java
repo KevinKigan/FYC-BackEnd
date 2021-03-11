@@ -1,13 +1,10 @@
 package com.kevingomez.FYCBackEnd.models.DAO.dao.Interfaces;
 
-import com.kevingomez.FYCBackEnd.models.entity.Carroceria;
-import com.kevingomez.FYCBackEnd.models.entity.Coche;
-import com.kevingomez.FYCBackEnd.models.entity.Modelo;
-import com.kevingomez.FYCBackEnd.models.entity.TipoMotor;
+import com.kevingomez.FYCBackEnd.models.entity.Coches.Coche;
+import com.kevingomez.FYCBackEnd.models.entity.Coches.TipoMotor;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public interface ICocheDAO extends JpaRepository<Coche, Integer> {

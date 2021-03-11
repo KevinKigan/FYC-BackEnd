@@ -2,20 +2,14 @@ package com.kevingomez.FYCBackEnd.models.DAO.Services.Impl;
 
 import com.kevingomez.FYCBackEnd.models.DAO.Services.Interfaces.ICocheService;
 import com.kevingomez.FYCBackEnd.models.DAO.dao.Interfaces.*;
-import com.kevingomez.FYCBackEnd.models.entity.*;
+import com.kevingomez.FYCBackEnd.models.entity.Coches.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.Resource;
-import org.springframework.core.io.UrlResource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.net.MalformedURLException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -54,18 +48,7 @@ public class CocheService implements ICocheService {
     @Autowired
     private FiltrosService filtroService;
 
-    private static Logger log = LoggerFactory.getLogger(CocheService.class);
-
-    /**
-     * Metodo para retornar todos los coches
-     *
-     * @return Lista de coches
-     */
-    @Override
-    @Transactional(readOnly = true) //Select solo de lectura
-    public List<Coche> findAllCoches() {
-        return cocheDAO.findAll();
-    }
+    private static final Logger log = LoggerFactory.getLogger(CocheService.class);
 
     /**
      * Metodo para retornar todos los coches
@@ -380,20 +363,6 @@ public class CocheService implements ICocheService {
 
 
     /**
-     * Metodo para retornar una pagina con coches
-     *
-     * @param pageable Pagina de coches a buscar
-     * @return Pagina con los coches
-     */
-    @Override
-    @Transactional(readOnly = true) //Select solo de lectura
-    public Page<Coche> findAllCoches(Pageable pageable) {
-        // Lo retorna si lo encuentra y en caso contrario retorna null
-        return cocheDAO.findAll(pageable);
-    }
-
-
-    /**
      * Metodo para retornar una pagina con modelos
      *
      * @param pageable Pagina de modelos a buscar
@@ -567,28 +536,7 @@ public class CocheService implements ICocheService {
 //        return coches.get(0);
     }
 
-    /**
-     * Metodo para retornar todos los logos de las marcas
-     *
-     * @return Logos de las marcas
-     */
-    @Override
-    @Transactional(readOnly = true) //Select solo de lectura
-    public Resource getMarcaLogo(int idMarca) {
-        log.info("Recuperando los logos de las marcas");
-        Marca marca = marcaDAO.findById(idMarca).orElse(null);
-        Resource resource = null;
-        if (marca != null) {
-            Path filePath = Paths.get("src/main/resources/static/images/marcas").resolve(marca.getMarcaCoche() + ".png").toAbsolutePath();
-            try {
-                resource = new UrlResource(filePath.toUri());
-            } catch (MalformedURLException e) {
-                log.error("Error al buscar la marca " + idMarca + ": " + e);
-                e.printStackTrace();
-            }
-        }
-        return resource;
-    }
+
 
     private ConsumoNormal getConsumoNormal(Coche coche) {
         int idConsumo = coche.getConsumo().getIdConsumo();

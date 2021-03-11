@@ -1,7 +1,6 @@
 package com.kevingomez.FYCBackEnd.models.DAO.dao.Interfaces;
 
-import com.kevingomez.FYCBackEnd.models.entity.Coche;
-import com.kevingomez.FYCBackEnd.models.entity.MotorCombustion;
+import com.kevingomez.FYCBackEnd.models.entity.Coches.MotorCombustion;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.ArrayList;

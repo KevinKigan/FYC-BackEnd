@@ -1,6 +1,6 @@
 package com.kevingomez.FYCBackEnd.models.DAO.dao.Interfaces;
 
-import com.kevingomez.FYCBackEnd.models.entity.Sobrealimentacion;
+import com.kevingomez.FYCBackEnd.models.entity.Coches.Sobrealimentacion;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
