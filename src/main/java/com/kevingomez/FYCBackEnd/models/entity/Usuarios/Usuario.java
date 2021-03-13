@@ -22,7 +22,8 @@ public class Usuario implements Serializable {
     private Boolean enabled;
     private Boolean verified;
     @Column(unique = true)
-    private String mail;
+    private String email;
+    @Column(name = "registration_date")
     private Date registrationDate;
 
     /*
@@ -37,6 +38,11 @@ public class Usuario implements Serializable {
     private List<Rol> roles;
 
     public Usuario() {
+    }
+
+    @PrePersist
+    public void prePersist(){
+        registrationDate = new Date();
     }
 
     public String getImage() {
@@ -99,12 +105,12 @@ public class Usuario implements Serializable {
         return roles;
     }
 
-    public String getMail() {
-        return mail;
+    public String getEmail() {
+        return email;
     }
 
-    public void setMail(String mail) {
-        this.mail = mail;
+    public void setEmail(String email) {
+        this.email = email;
     }
 
     public void setRoles(List<Rol> roles) {
