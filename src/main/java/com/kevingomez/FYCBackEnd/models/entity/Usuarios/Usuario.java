@@ -12,17 +12,19 @@ public class Usuario implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
-    @NotNull(message = "El campo Nombre de Usuario no puede estar vacio")
+    @NotNull(message = "El campo Nombre de Usuario no puede estar vacio.")
     @Column(unique = true, length = 20)
     private String username;
-    @NotNull(message = "El campo Contraseña no puede estar vacio")
+    @NotNull(message = "El campo Contraseña no puede estar vacio.")
     @Column(length = 60)
     private String password;
     private String image;
     private Boolean enabled;
     private Boolean verified;
     @Column(unique = true)
+    @NotNull(message = "El campo Email no puede estar vacio.")
     private String email;
+    @Temporal(TemporalType.DATE)
     @Column(name = "registration_date")
     private Date registrationDate;
 

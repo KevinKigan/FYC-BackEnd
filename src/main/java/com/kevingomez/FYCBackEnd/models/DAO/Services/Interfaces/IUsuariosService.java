@@ -11,4 +11,7 @@ public interface IUsuariosService {
     Usuario save(Usuario user);
     void delete(int id);
     Usuario findById(int id);
+    String comprobarVerificado(int id, String code);
+    Usuario findByUsername(String username);
+    Usuario findByEmail(String email);
 }
