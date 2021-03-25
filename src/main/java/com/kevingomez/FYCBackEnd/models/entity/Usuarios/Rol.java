@@ -6,6 +6,7 @@ import java.io.Serializable;
 @Entity
 @Table(name = "Roles")
 public class Rol implements Serializable {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
