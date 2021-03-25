@@ -14,11 +14,7 @@ import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 import java.io.FileReader;
 import java.io.IOException;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Properties;
 
 @Service
@@ -31,13 +27,13 @@ public class EmailService implements IEmailService {
     @Autowired
     private UsuariosService usuariosService;
 
-    Properties propiedades = new Properties();
+    private final Properties propiedades = new Properties();
 
 
     @Override
     public boolean sendEmailVerificate(Usuario usuario, String tipo) {
         try {
-            propiedades.load(new FileReader(String.valueOf(Paths.get("src/main/resources/").resolve("static.properties").toAbsolutePath())));
+            propiedades.load(new FileReader(String.valueOf(Paths.get("src/main/resources/").resolve("mail.properties").toAbsolutePath())));
             String header = propiedades.getProperty("mail.cabezeraVerificacion");
             String headerEnd = propiedades.getProperty("mail.cabezeraVerificacionCierre");
             String saludo = propiedades.getProperty("mail.saludo");

@@ -11,18 +11,16 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 
-import javax.validation.ConstraintViolation;
-import javax.validation.ConstraintViolationException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import javax.validation.Valid;
+import java.util.*;
+import java.util.stream.Collectors;
 
-@CrossOrigin(origins = {"http://localhost:4200"})
 
-//@CrossOrigin(origins = {"https://findyourcarapp-96860.web.app"})
 @RestController
 @RequestMapping("/api/user")
 public class UsuariosController {
@@ -35,11 +33,17 @@ public class UsuariosController {
     @Autowired
     private IEmailService emailService;
 
+    @Secured("ROLE_ADMIN")
+    @GetMapping("/index")
+    public List<Usuario> index() {
+        return usuariosService.findAll();
+    }
     /**
      * Metodo para retornar todos los usuarios
      *
      * @return Pagina con los usuarios
      */
+    @Secured("ROLE_ADMIN")
     @GetMapping("/index/{pageSize}/page/{page}")
     public Page<Usuario> index(@PathVariable Integer pageSize, @PathVariable Integer page) {
         log.info("Buscamos usuarios. Página " + page + " con " + pageSize + " elementos");
@@ -52,6 +56,7 @@ public class UsuariosController {
      * @param id Identificador del usuario
      * @return Usuario encontrado
      */
+    @Secured("ROLE_ADMIN")
     @GetMapping("/{id}")
     public ResponseEntity<?> show(@PathVariable int id) {
         Usuario user = null;
@@ -76,6 +81,7 @@ public class UsuariosController {
      *
      * @param id Identificador del usuario
      */
+    @Secured("ROLE_ADMIN")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @DeleteMapping("/{id}")
     public ResponseEntity<?> delete(@PathVariable int id) {
@@ -98,13 +104,21 @@ public class UsuariosController {
      * @param usuario Usuario a crear
      * @return Usuario creado
      */
+    @Secured("ROLE_ADMIN")
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping("create")
-    public ResponseEntity<?> create(@RequestBody Usuario usuario) {
+    public ResponseEntity<?> create(@Valid @RequestBody Usuario usuario, BindingResult result) {
+        //@Valid valida el usuario desde el propio body de la peticion
         Usuario user = null;
         Map<String, Object> response = new HashMap<>();
+        if(result.hasErrors()){
+            List<String> errors = result.getFieldErrors().stream().map(e-> ""+e.getDefaultMessage()).collect(Collectors.toList());
+            response.put("errors", errors);
+            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+        }
         try {
             user = usuariosService.save(usuario);
+            //todo
         } catch (DataAccessException e) {
             if (Objects.requireNonNull(e.getMostSpecificCause().getMessage()).contains("Duplicate entry")) {
                 if (Objects.requireNonNull(e.getMostSpecificCause().getMessage()).contains("@")) {
@@ -135,16 +149,22 @@ public class UsuariosController {
      * @param id      Identificador del usuario
      * @return Usuario modificado
      */
+    @Secured("ROLE_ADMIN")
     @ResponseStatus(HttpStatus.CREATED)
     @PutMapping("/{id}")
-    public ResponseEntity<?> update(@RequestBody Usuario usuario, @PathVariable int id) {
-        Usuario usuarioBBDD = usuariosService.findById(id);
+    public ResponseEntity<?> update(@Valid @RequestBody Usuario usuario, BindingResult result, @PathVariable int id) {
         Map<String, Object> response = new HashMap<>();
-        if (usuarioBBDD == null) {
-            response.put("error", "No se puede editar, el usuario no existe.");
-            return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
-        }
         try {
+            Usuario usuarioBBDD = usuariosService.findById(id);
+            if(result.hasErrors()){
+                List<String> errors = result.getFieldErrors().stream().map(e->""+e.getDefaultMessage()).collect(Collectors.toList());
+                response.put("errors", errors);
+                return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+            }
+            if (usuarioBBDD == null) {
+                response.put("error", "No se puede editar, el usuario no existe.");
+                return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
+            }
             Usuario usuarioActualizado = null;
             usuarioBBDD.setImage(usuario.getImage());
             usuarioBBDD.setEnabled(usuario.getEnabled());
@@ -211,7 +231,7 @@ public class UsuariosController {
     }
 
     /**
-     * Metodo para enviar por correo un codigo de verificacion
+     * Metodo para comporbar el codigo de verificacion enviado por correo
      *
      * @param id Id del usuario
      * @return
@@ -231,7 +251,8 @@ public class UsuariosController {
     }
 
     /**
-     * Metodo para enviar por correo un codigo de verificacion
+     * Metodo para cambiar la contraseña al haber sido olvidada y
+     * enviar por correo un codigo de verificacion
      *
      * @param id Id del usuario
      * @return

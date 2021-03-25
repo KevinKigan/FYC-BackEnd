@@ -1,0 +1,13 @@
+{
+  "properties": [
+    {
+      "name": "propietario.Image",
+      "type": "java.lang.String",
+      "description": "Description for propietario.Image."
+    },
+    {
+      "name": "cors.url",
+      "type": "java.lang.String",
+      "description": "Description for cors.url."
+    }
+  ] }

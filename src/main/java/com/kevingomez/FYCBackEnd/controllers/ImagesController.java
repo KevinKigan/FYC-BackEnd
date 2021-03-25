@@ -15,10 +15,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-@CrossOrigin(origins = {"http://localhost:4200"})
-//@CrossOrigin(origins = {"https://findyourcarapp-96860.web.app"})
+
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/img")
 public class ImagesController {
 
     private static final Logger log = LoggerFactory.getLogger(ImagesController.class);
@@ -32,7 +31,7 @@ public class ImagesController {
      *
      * @return
      */
-    @GetMapping("/img/propietario")
+    @GetMapping("propietario")
     public ResponseEntity<Resource> showPropietario() {
         log.info("Buscando imagen del propietario");
         Resource resource = null;
@@ -52,7 +51,7 @@ public class ImagesController {
      *
      * @return Logo de la marca
      */
-    @GetMapping("img/marcaslogo/{idMarca}")
+    @GetMapping("marcaslogo/{idMarca}")
     public ResponseEntity<?> showLogosMarcas(@PathVariable int idMarca) {
         log.info("Buscando el logo de la marca "+idMarca);
         Map<String, Object> response = new HashMap<>();
@@ -74,7 +73,7 @@ public class ImagesController {
      *
      * @return Logo del modelo
      */
-    @PostMapping("img/modeloslogo")
+    @PostMapping("modeloslogo")
     public ResponseEntity<?> showLogosModelos(@RequestBody List<Integer> idsModelos) {
         log.info("Buscando logos de modelos ");
         HashMap<Integer, String> urls;

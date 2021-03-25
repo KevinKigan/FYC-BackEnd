@@ -14,4 +14,6 @@ public interface IUsuariosService {
     String comprobarVerificado(int id, String code);
     Usuario findByUsername(String username);
     Usuario findByEmail(String email);
+
+    List<Usuario> findAll();
 }
