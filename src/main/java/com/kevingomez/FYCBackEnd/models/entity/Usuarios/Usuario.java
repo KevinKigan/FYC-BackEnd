@@ -1,10 +1,13 @@
 package com.kevingomez.FYCBackEnd.models.entity.Usuarios;
 
+import javax.management.relation.Role;
 import javax.persistence.*;
+import javax.validation.constraints.Email;
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import java.io.Serializable;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 @Entity
 @Table(name = "Usuarios")
@@ -12,17 +15,25 @@ public class Usuario implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
-    @NotNull(message = "El campo Nombre de Usuario no puede estar vacio")
+    @Size(min = 4,max = 20)
+    @NotEmpty(message = "El campo Nombre de Usuario no puede estar vacio.")
     @Column(unique = true, length = 20)
     private String username;
-    @NotNull(message = "El campo Contraseña no puede estar vacio")
+
+    @NotEmpty(message = "El campo Contraseña no puede estar vacio.")
+    @Size(min = 6,max = 60)
     @Column(length = 60)
     private String password;
     private String image;
     private Boolean enabled;
     private Boolean verified;
-    @Column(unique = true)
-    private String mail;
+
+    @Column(nullable = false, unique = true)
+    @NotEmpty(message = "El campo Email no puede estar vacio.")
+    @Email
+    private String email;
+    @Temporal(TemporalType.DATE)
+    @Column(name = "registration_date")
     private Date registrationDate;
 
     /*
@@ -33,10 +44,15 @@ public class Usuario implements Serializable {
     @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     // Si se elimina al usuario, se eliminan sus roles e igual para la creacion
     //@JoinTable(uniqueConstraints = {@UniqueConstraint(columnNames = {"usuario_id","rol_id"})})
-    @JoinTable(name = "usuarios_roles", joinColumns = @JoinColumn(name = "usuario_id"), inverseJoinColumns = @JoinColumn(name = "rol_id"))
+    @JoinTable(name = "usuarios_roles", joinColumns = @JoinColumn(name = "usuario_id"), inverseJoinColumns = @JoinColumn(name = "rol_id"),uniqueConstraints = {@UniqueConstraint(columnNames = {"usuario_id","rol_id"})})
     private List<Rol> roles;
 
     public Usuario() {
+    }
+
+    @PrePersist
+    public void prePersist(){
+        registrationDate = new Date();
     }
 
     public String getImage() {
@@ -99,12 +115,12 @@ public class Usuario implements Serializable {
         return roles;
     }
 
-    public String getMail() {
-        return mail;
+    public String getEmail() {
+        return email;
     }
 
-    public void setMail(String mail) {
-        this.mail = mail;
+    public void setEmail(String email) {
+        this.email = email;
     }
 
     public void setRoles(List<Rol> roles) {

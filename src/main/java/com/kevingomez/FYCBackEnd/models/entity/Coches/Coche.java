@@ -44,7 +44,7 @@ public class Coche implements Serializable {
     @JsonIgnoreProperties(value={"hibernateLazyInitializer","handler"}, allowSetters = true)
     private Carroceria carroceria;
 
-    @OneToOne(fetch = FetchType.LAZY) // Un coche tiene un tipo de motor
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL) // Un coche tiene un tipo de motor
     @JoinColumn(name = "tipo_motor_id")
     @NotNull(message = "La tipo de motor no puede estar vacio")
     @JsonIgnoreProperties(value={"motorCombustion","motorElectrico","hibernateLazyInitializer","handler"}, allowSetters = true)
@@ -55,7 +55,7 @@ public class Coche implements Serializable {
 
     private int precio;
 
-    @OneToOne(fetch = FetchType.LAZY) // Un coche tiene un consumo
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL) // Un coche tiene un consumo
     @JoinColumn(name = "consumo_id")
     @JsonIgnoreProperties(value={"idConsumoNormal","idConsumoAlternativo","idConsumoElectrico","hibernateLazyInitializer","handler"}, allowSetters = true) // Esto se hace por el fecth lazy
     private Consumo consumo;

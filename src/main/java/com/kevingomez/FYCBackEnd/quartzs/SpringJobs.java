@@ -9,6 +9,8 @@ import com.dropbox.core.v2.files.Metadata;
 import com.dropbox.core.v2.users.FullAccount;
 import com.kevingomez.FYCBackEnd.models.DAO.Services.Impl.CocheService;
 import com.kevingomez.FYCBackEnd.models.DAO.Services.Interfaces.ICocheService;
+import com.kevingomez.FYCBackEnd.models.DAO.Services.Interfaces.IEmailService;
+import com.kevingomez.FYCBackEnd.models.entity.Usuarios.Verificacion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +29,7 @@ public class SpringJobs {
 
     @Autowired
     ICocheService cocheService;
+
     private static final Logger log = LoggerFactory.getLogger(SpringJobs.class);
 
 
@@ -46,6 +49,7 @@ public class SpringJobs {
         }
         log.info("Finalizado Job Calcular Volumenes " + System.currentTimeMillis() / 1000);
     }
+
 
 
 //    @Scheduled(fixedDelay = 2000)

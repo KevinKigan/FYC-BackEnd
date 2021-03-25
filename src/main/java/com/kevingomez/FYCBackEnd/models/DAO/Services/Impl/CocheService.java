@@ -28,10 +28,6 @@ public class CocheService implements ICocheService {
     @Autowired
     private IModeloDAO modeloDAO;
     @Autowired
-    private IMarcaDAO marcaDAO;
-    @Autowired
-    private ICarroceriaDAO carroceriaDAO;
-    @Autowired
     private IVolumenDAO volumenDAO;
     @Autowired
     private IConsumoDAO consumoDAO;
@@ -65,17 +61,6 @@ public class CocheService implements ICocheService {
         return hash;
     }
 
-
-    /**
-     * Metodo para retornar todas las marcas
-     *
-     * @return Lista de marcas
-     */
-    @Override
-    @Transactional(readOnly = true) //Select solo de lectura
-    public List<Marca> findAllMarcas() {
-        return marcaDAO.findAll();
-    }
 
     @Override
     public List<Consumo> findAllConsumosById(List<Integer> idsConsumo) {
@@ -318,24 +303,6 @@ public class CocheService implements ICocheService {
         return cocheDAO.findByModelo_IdModelo(idModelo);
     }
 
-    /**
-     * Metodo para buscar en bbdd todas las carrocerias
-     *
-     * @return Lista de carrocerias
-     */
-    @Override
-    @Transactional(readOnly = true) //Select solo de lectura
-    public List<Carroceria> findAllCarrocerias() {
-        return carroceriaDAO.findAll();
-    }
-
-    @Override
-    public HashMap<String,String> findImagen(String modelo, String marca) {
-        HashMap<String,String> map = new HashMap();
-        map.put("imagen",this.modeloDAO.findByModeloAndMarca_MarcaCoche(modelo, marca).getImagen());
-        return map;
-    }
-
 
     /**
      * Metodo para retornar un coche segun su id
@@ -348,56 +315,6 @@ public class CocheService implements ICocheService {
     public Coche findCocheById(int id) {
         // Lo retorna si lo encuentra y en caso contrario retorna null
         return cocheDAO.findById(id).orElse(null);
-    }
-
-    /**
-     * Metodo para retornar un modelo segun su id
-     *
-     * @param id Id del modelo a retornar
-     * @return Modelo con id especificado
-     */
-    @Override
-    public Modelo findModeloById(int id) {
-        return modeloDAO.findById(id).orElse(null);
-    }
-
-
-    /**
-     * Metodo para retornar una pagina con modelos
-     *
-     * @param pageable Pagina de modelos a buscar
-     * @return Pagina con los modelos
-     */
-    @Override
-    @Transactional(readOnly = true) //Select solo de lectura
-    public Page<Modelo> findAllModelos(Pageable pageable) {
-        return modeloDAO.findAll(pageable);
-    }
-
-    /**
-     * Metodo para retornar una pagina con modelos segun la marca especificada
-     *
-     * @param pageable Pagina de modelos a buscar
-     * @return Pagina con los modelos
-     */
-    @Override
-    @Transactional(readOnly = true) //Select solo de lectura
-    public Page<Modelo> findAllModelosPorMarca(Pageable pageable, int idMarca) {
-        // Lo retorna si lo encuentra y en caso contrario retorna null
-        return modeloDAO.findAllByMarca_IdMarca(pageable, idMarca);
-    }
-
-
-    /**
-     * Metodo para retornar todos los modelos segun la marca especificada
-     *
-     * @return Lista con los modelos
-     */
-    @Override
-    @Transactional(readOnly = true) //Select solo de lectura
-    public List<Modelo> findAllModelosPorMarca(int idMarca) {
-        // Lo retorna si lo encuentra y en caso contrario retorna null
-        return modeloDAO.findAllByMarca_IdMarca(idMarca);
     }
 
 
