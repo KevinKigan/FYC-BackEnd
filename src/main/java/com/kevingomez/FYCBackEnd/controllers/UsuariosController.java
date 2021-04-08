@@ -3,6 +3,9 @@ package com.kevingomez.FYCBackEnd.controllers;
 import com.kevingomez.FYCBackEnd.models.DAO.Services.Interfaces.IEmailService;
 import com.kevingomez.FYCBackEnd.models.DAO.Services.Interfaces.IUsuariosService;
 import com.kevingomez.FYCBackEnd.models.entity.Usuarios.Usuario;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,9 +16,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.validation.BindingResult;
-import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
-
 import javax.validation.Valid;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -59,7 +60,7 @@ public class UsuariosController {
     @Secured("ROLE_ADMIN")
     @GetMapping("/{id}")
     public ResponseEntity<?> show(@PathVariable int id) {
-        Usuario user = null;
+        Usuario user;
         Map<String, Object> response = new HashMap<>();
         try {
             user = usuariosService.findById(id);
@@ -74,6 +75,66 @@ public class UsuariosController {
         }
         return new ResponseEntity<>(user, HttpStatus.OK);
 
+    }
+
+
+    /**
+     * metodo para obtener un usuario mediante id
+     *
+     * @param username Nomrbe de usuario
+     * @return Usuario encontrado
+     */
+    @Secured("ROLE_USER")
+    @GetMapping("/username/{username}")
+    public ResponseEntity<?> showMyUser(@PathVariable String username, @RequestHeader (name="Authorization") String token) {
+        Usuario user;
+        Map<String, Object> response = new HashMap<>();
+        String usernameToken;
+        try {
+            usernameToken = getUsername(token);
+        } catch (ParseException e) {
+            response.put("error", "Error al comprobar veracidad del token.");
+            log.error(e.toString());
+            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        if(usernameToken==null || usernameToken.equals("")){
+            response.put("error", "El nombre de usuario no se ha podido comprobar.");
+            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        if(!usernameToken.equals(username)){
+            response.put("error", "Se ha detectado manupulación de datos. Acceso denegado!");
+            log.error("Se ha detectado manupulación de datos. Acceso denegado!");
+            return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
+        }
+        try {
+            user = usuariosService.findByUsername(username);
+            user.setPassword("");
+        } catch (DataAccessException e) {
+            response.put("error", "Error al realizar la consulta en la base de datos.");
+            log.error(e.getMessage() + ": " + e.getMostSpecificCause().getMessage());
+            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        if (user == null) {
+            response.put("error", "El usuario no existe.");
+            return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
+        }
+        return new ResponseEntity<>(user, HttpStatus.OK);
+
+    }
+
+    /**
+     * Metodo para comprobar la validez del token
+     * @param token
+     * @return Nombre de usuario
+     */
+    private String getUsername(String token) throws ParseException {
+        String payload = token.split("\\.")[1];
+        payload = new String(Base64.getDecoder().decode(payload));
+        JSONParser parser = new JSONParser();
+        JSONObject json = (JSONObject) parser.parse(payload);
+            /* La verificacion de token se realiza de manera automatica
+               por lo que no es necesaria comprobarla aqui */
+        return json.get("username").toString();
     }
 
     /**
@@ -117,6 +178,7 @@ public class UsuariosController {
             return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
         }
         try {
+            usuario.setEnabled(true);
             user = usuariosService.save(usuario);
             //todo
         } catch (DataAccessException e) {

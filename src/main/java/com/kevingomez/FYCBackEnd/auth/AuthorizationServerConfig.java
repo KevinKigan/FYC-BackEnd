@@ -10,11 +10,9 @@ import org.springframework.security.oauth2.config.annotation.web.configuration.A
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableAuthorizationServer;
 import org.springframework.security.oauth2.config.annotation.web.configurers.AuthorizationServerEndpointsConfigurer;
 import org.springframework.security.oauth2.config.annotation.web.configurers.AuthorizationServerSecurityConfigurer;
-import org.springframework.security.oauth2.provider.token.TokenEnhancer;
 import org.springframework.security.oauth2.provider.token.TokenEnhancerChain;
 import org.springframework.security.oauth2.provider.token.store.JwtAccessTokenConverter;
 
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.nio.file.Paths;
@@ -98,7 +96,6 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
                 .resolve("security.properties").toAbsolutePath())));
         String privateKey = propiedades.getProperty("jwt.privateKey");
         String publicKey  = propiedades.getProperty("jwt.publicKey");
-
         jwtAccessTokenConverter.setSigningKey(privateKey);
         jwtAccessTokenConverter.setVerifierKey(publicKey);
         return jwtAccessTokenConverter;

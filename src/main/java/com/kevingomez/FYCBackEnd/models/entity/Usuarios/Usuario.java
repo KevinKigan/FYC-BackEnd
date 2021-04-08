@@ -25,8 +25,8 @@ public class Usuario implements Serializable {
     @Column(length = 60)
     private String password;
     private String image;
-    private Boolean enabled;
-    private Boolean verified;
+    private Boolean enabled = false;
+    private Boolean verified = false;
 
     @Column(nullable = false, unique = true)
     @NotEmpty(message = "El campo Email no puede estar vacio.")
