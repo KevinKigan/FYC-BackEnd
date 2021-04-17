@@ -42,6 +42,18 @@ public class ModelosService implements IModelosService {
     }
 
     /**
+     * Metodo para guardar una marca
+     *
+     * @return Lista de marcas
+     */
+    @Override
+    public Marca saveMarca(Marca marca) {
+        return marcaDAO.save(marca);
+    }
+
+
+
+    /**
      * Metodo para buscar en bbdd todas las carrocerias
      *
      * @return Lista de carrocerias

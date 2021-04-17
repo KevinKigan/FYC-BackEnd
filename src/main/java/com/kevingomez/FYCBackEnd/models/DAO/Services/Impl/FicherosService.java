@@ -10,7 +10,9 @@ import com.dropbox.core.v2.files.FileMetadata;
 import com.dropbox.core.v2.files.ListFolderResult;
 import com.dropbox.core.v2.files.Metadata;
 import com.dropbox.core.v2.sharing.SharedLinkMetadata;
+import com.kevingomez.FYCBackEnd.models.DAO.dao.Interfaces.IUsuarioDAO;
 import com.kevingomez.FYCBackEnd.models.entity.Usuarios.Usuario;
+import org.aspectj.weaver.IUnwovenClassFile;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
@@ -32,6 +34,7 @@ import java.net.MalformedURLException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
@@ -44,6 +47,9 @@ public class FicherosService implements IFicherosService {
 
     @Autowired
     private IMarcaDAO marcaDAO;
+
+    @Autowired
+    private IUsuarioDAO usuarioDAO;
 
     @Value("${accessTokenDropbox}")
     private String ACCESS_TOKEN;
@@ -77,21 +83,36 @@ public class FicherosService implements IFicherosService {
         }
     }
 
+//    @Override
+//    public void deleteUser(int id){
+//        Object obj = retrieveLinkFile(LINKS_USUARIOS);
+//        JSONObject jsonObject = (JSONObject) obj;
+//        JSONObject finalJsonObject = (JSONObject) jsonObject.get("linkusuarios");
+//        if (finalJsonObject.getOrDefault(String.valueOf(id), null) != null) {
+//            // Si el usuario ya tenia foto de perfil
+//            finalJsonObject.remove(Integer.toString(id));
+//            saveFileLocaleAndRemote(jsonObject, LINKS_USUARIOS);
+//        }
+//
+//    }
+
 
     /**
      * Metodo para subir un archivo a dropbox
      */
     public String uploadFile(String area, MultipartFile file, String filename) {
         try {
-            String pathRemote = "";
-            switch (area) {
-                case "userImage":
-                    pathRemote = PATH_USUARIOS;
-                    break;
-                case "links":
-                    pathRemote = PATH_LINKS;
-                    break;
-            }
+            HashMap<String, String> paths = getLocalAndRemotePaths(area);
+            String pathRemote = paths.get("remote");
+//            String pathRemote = "";
+//            switch (area) {
+//                case "userImage":
+//                    pathRemote = PATH_USUARIOS;
+//                    break;
+//                case "links":
+//                    pathRemote = PATH_LINKS;
+//                    break;
+//            }
             DbxClientV2 client = createClient();
             if (filename.equals("")) {
                 filename = file.getOriginalFilename();
@@ -163,6 +184,26 @@ public class FicherosService implements IFicherosService {
 //    }
 
     /**
+     * Metodo para obtener los path local y remoto
+     * @param area
+     * @return
+     */
+    private HashMap<String, String> getLocalAndRemotePaths(String area){
+        HashMap<String, String> paths = new HashMap<>();
+        switch (area) {
+            case "userImage":
+                paths.put("remote",PATH_USUARIOS);
+                paths.put("local",Paths.get("src/main/resources/static/users/").toAbsolutePath().toString());
+                break;
+            case "links":
+                paths.put("remote",PATH_LINKS);
+                paths.put("local",Paths.get("src/main/resources/static/linkfiles/").toAbsolutePath().toString());
+                break;
+        }
+        return paths;
+    }
+
+    /**
      * Metodo para descargar un fichero
      *
      * @param area     Tipo de area al que pertenece el fichero
@@ -172,19 +213,21 @@ public class FicherosService implements IFicherosService {
      * @throws IOException
      */
     public Path downloadFile(String area, String filename) throws DbxException, IOException {
-        String pathRemote = "";
-        String localPath = "";
-        switch (area) {
-            case "userImage":
-                pathRemote = PATH_USUARIOS;
-                localPath = Paths.get("src/main/resources/static/users/").toAbsolutePath().toString();
-                break;
-            case "links":
-                pathRemote = PATH_LINKS;
-                localPath = Paths.get("src/main/resources/static/linkfiles/").toAbsolutePath().toString();
-                break;
 
-        }
+        HashMap<String, String> paths = getLocalAndRemotePaths(area);
+        String pathRemote = paths.get("remote");
+        String localPath = paths.get("local");
+//        switch (area) {
+//            case "userImage":
+//                pathRemote = PATH_USUARIOS;
+//                localPath = Paths.get("src/main/resources/static/users/").toAbsolutePath().toString();
+//                break;
+//            case "links":
+//                pathRemote = PATH_LINKS;
+//                localPath = Paths.get("src/main/resources/static/linkfiles/").toAbsolutePath().toString();
+//                break;
+//
+//        }
         DbxClientV2 client = createClient();
         File dir = new File(localPath);
         if (!dir.exists()) dir.mkdirs();
@@ -349,6 +392,12 @@ public class FicherosService implements IFicherosService {
     @Override
     public HashMap<Integer, String> getURLUsuario(List<Integer> idsUsuarios) {
         HashMap<Integer, String> url = new HashMap<>();
+        if(idsUsuarios.get(0)==-1){ // Se quieren buscar todas las imagenes de los usuarios
+            idsUsuarios = new ArrayList<>();
+            List<Integer> finalIdsUsuarios = idsUsuarios;
+            usuarioDAO.findAll().forEach(usuario -> finalIdsUsuarios.add(usuario.getId()));
+            idsUsuarios = finalIdsUsuarios;
+        }
         Object obj = retrieveLinkFile(LINKS_USUARIOS);
         JSONObject jsonObject = (JSONObject) obj;
         jsonObject = (JSONObject) jsonObject.get("linkusuarios");
@@ -362,6 +411,8 @@ public class FicherosService implements IFicherosService {
         });
         return url;
     }
+
+
 
     /**
      * Metodo para actualizar la URL del usuario en el archivo de urls local y remoto
@@ -443,35 +494,35 @@ public class FicherosService implements IFicherosService {
         return null;
     }
 
-    @Override
-    public String copy(MultipartFile file) throws IOException {
-        String fileName = UUID.randomUUID() + "_" + file.getOriginalFilename().replace(" ", "");
-        Path filePath = getPath(fileName);
-        log.info(filePath.toString());
-        Files.copy(file.getInputStream(), filePath);
-        return fileName;
-    }
+//    @Override
+//    public String copy(MultipartFile file) throws IOException {
+//        String fileName = UUID.randomUUID() + "_" + file.getOriginalFilename().replace(" ", "");
+//        Path filePath = getPath(fileName);
+//        log.info(filePath.toString());
+//        Files.copy(file.getInputStream(), filePath);
+//        return fileName;
+//    }
 
-    @Override
-    public boolean delete(String nameImage) {
-        if (nameImage != null && nameImage.length() > 0) {
-            Path lastfilePath = getPath(nameImage);
-            File lastFile = lastfilePath.toFile();
-            if (lastFile.exists() && lastFile.canRead()) {
-                lastFile.delete();
-            }
-        }
-        return false;
-    }
-
-    @Override
-    public Path getPath(String nameImage) {
-        if (tipo.equals("usuarios")) {
-            return Paths.get(UPLOAD_DIR + "usuarios").resolve(nameImage).toAbsolutePath();
-        } else if (tipo.equals("modelos")) {
-            return Paths.get(UPLOAD_DIR + "modelos").resolve(nameImage).toAbsolutePath();
-        } else {
-            return null;
-        }
-    }
+//    @Override
+//    public boolean delete(String nameImage) {
+//        if (nameImage != null && nameImage.length() > 0) {
+//            Path lastfilePath = getPath(nameImage);
+//            File lastFile = lastfilePath.toFile();
+//            if (lastFile.exists() && lastFile.canRead()) {
+//                lastFile.delete();
+//            }
+//        }
+//        return false;
+//    }
+//
+//    @Override
+//    public Path getPath(String nameImage) {
+//        if (tipo.equals("usuarios")) {
+//            return Paths.get(UPLOAD_DIR + "usuarios").resolve(nameImage).toAbsolutePath();
+//        } else if (tipo.equals("modelos")) {
+//            return Paths.get(UPLOAD_DIR + "modelos").resolve(nameImage).toAbsolutePath();
+//        } else {
+//            return null;
+//        }
+//    }
 }

@@ -1,7 +1,9 @@
 package com.kevingomez.FYCBackEnd.models.DAO.Services.Impl;
 
 import com.kevingomez.FYCBackEnd.models.DAO.Services.Interfaces.IUsuariosService;
+import com.kevingomez.FYCBackEnd.models.DAO.dao.Interfaces.IRolDAO;
 import com.kevingomez.FYCBackEnd.models.DAO.dao.Interfaces.IUsuarioDAO;
+import com.kevingomez.FYCBackEnd.models.entity.Usuarios.Rol;
 import com.kevingomez.FYCBackEnd.models.entity.Usuarios.Usuario;
 import com.kevingomez.FYCBackEnd.models.entity.Usuarios.Verificacion;
 import org.slf4j.Logger;
@@ -18,9 +20,9 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
@@ -30,6 +32,8 @@ public class UsuariosService implements IUsuariosService, UserDetailsService {
 
     @Autowired
     private IUsuarioDAO usuarioDAO;
+    @Autowired
+    private IRolDAO rolDAO;
 
     private HashMap<Integer, Verificacion> verificacionEnProceso= new HashMap<>();
 
@@ -61,6 +65,41 @@ public class UsuariosService implements IUsuariosService, UserDetailsService {
     @Transactional(readOnly = true)
     public Usuario findByEmail(String email) {
         return usuarioDAO.findByEmail(email);
+    }
+
+    @Override
+    public HashMap<String, Object> setRoles(ArrayList<String> roles, int id) {
+        HashMap<String, Object> map = new HashMap<>();
+        Usuario user = usuarioDAO.findById(id).orElse(null);
+        if(user!=null) {
+            List<Rol> actualRoles = user.getRoles();
+            List<Rol> allRoles = rolDAO.findAll();
+            for (Rol rol :allRoles) {
+                if(roles.contains(rol.getRolName())){
+                    // Borramos el rol del usuario
+                    if(user.getRoles().contains(rol)){
+                        for (Rol actualRol:actualRoles) {
+                            if(actualRol.getRolName().equals(rol.getRolName())){
+                                actualRoles.remove(actualRol);
+                            }
+                            break;
+                        }
+                    }
+                    // Añadimos el rol al usuario
+                    else{
+                        actualRoles.add(rol);
+                    }
+                }
+            }
+            user.setRoles(actualRoles);
+            usuarioDAO.save(user);
+            log.info("Roles actualizados correctamente.");
+            map.put("message", "Roles actualizados correctamente.");
+            map.put("roles", user.getRoles());
+            return map;
+        }
+        map.put("error", "Usuario no encontrado.");
+        return map;
     }
 
     @Override

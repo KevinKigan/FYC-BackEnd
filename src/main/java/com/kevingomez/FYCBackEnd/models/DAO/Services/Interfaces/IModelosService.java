@@ -15,6 +15,7 @@ public interface IModelosService {
     List<Carroceria> findAllCarrocerias();
     Modelo findModeloById(int id);
     Page<Modelo> findAllModelos(Pageable pageable);
+    Marca saveMarca(Marca marca);
     Page<Modelo> findAllModelosPorMarca(Pageable pageable, int idMarca);
     List<Modelo> findAllModelosPorMarca(int idMarca);
     HashMap<String,String> findImagen(String modelo, String marca);

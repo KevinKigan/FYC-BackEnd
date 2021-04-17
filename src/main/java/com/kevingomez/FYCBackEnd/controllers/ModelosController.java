@@ -13,6 +13,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
@@ -39,8 +40,30 @@ public class ModelosController {
      */
     @GetMapping("marcas")
     public List<Marca> indexMarcas() {
-        log.info("Buscando todos las marcas");
+        log.info("Buscando todas las marcas");
         return modelosService.findAllMarcas();
+    }
+
+    /**
+     * Metodo para guardar una marca
+     *
+     * @return Lista de Marcas
+     */
+    @Secured("ROLE_ADMIN")
+    @PostMapping("save_marca")
+    public ResponseEntity<?> saveMarca(@RequestBody Marca marca) {
+        Map<String, Object> response = new HashMap<>();
+        if(marca.getMarcaCoche()!=null && !marca.getMarcaCoche().trim().equals("")) {
+            log.info("Guardando marca actualizada");
+            modelosService.saveMarca(marca);
+            response.put("marca", marca);
+            response.put("message", "Marca guardada correctamente.");
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        }else{
+            log.error("La marca no se ha podido guardar. Datos invalidos");
+            response.put("error", "La marca no se ha podido guardar. Datos invalidos.");
+            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+        }
     }
 
     /**

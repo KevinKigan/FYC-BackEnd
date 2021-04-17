@@ -1,7 +1,9 @@
 package com.kevingomez.FYCBackEnd.controllers;
 
 import com.kevingomez.FYCBackEnd.models.DAO.Services.Interfaces.IEmailService;
+import com.kevingomez.FYCBackEnd.models.DAO.Services.Interfaces.IFicherosService;
 import com.kevingomez.FYCBackEnd.models.DAO.Services.Interfaces.IUsuariosService;
+import com.kevingomez.FYCBackEnd.models.entity.Usuarios.Rol;
 import com.kevingomez.FYCBackEnd.models.entity.Usuarios.Usuario;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -14,9 +16,11 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+//import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+
 import javax.validation.Valid;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -34,11 +38,15 @@ public class UsuariosController {
     @Autowired
     private IEmailService emailService;
 
+    @Autowired
+    private IFicherosService ficherosService;
+
     @Secured("ROLE_ADMIN")
     @GetMapping("/index")
     public List<Usuario> index() {
         return usuariosService.findAll();
     }
+
     /**
      * Metodo para retornar todos los usuarios
      *
@@ -86,7 +94,7 @@ public class UsuariosController {
      */
     @Secured("ROLE_USER")
     @GetMapping("/username/{username}")
-    public ResponseEntity<?> showMyUser(@PathVariable String username, @RequestHeader (name="Authorization") String token) {
+    public ResponseEntity<?> showMyUser(@PathVariable String username, @RequestHeader(name = "Authorization") String token) {
         Usuario user;
         Map<String, Object> response = new HashMap<>();
         String usernameToken;
@@ -97,11 +105,11 @@ public class UsuariosController {
             log.error(e.toString());
             return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        if(usernameToken==null || usernameToken.equals("")){
+        if (usernameToken == null || usernameToken.equals("")) {
             response.put("error", "El nombre de usuario no se ha podido comprobar.");
             return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        if(!usernameToken.equals(username)){
+        if (!usernameToken.equals(username)) {
             response.put("error", "Se ha detectado manupulación de datos. Acceso denegado!");
             log.error("Se ha detectado manupulación de datos. Acceso denegado!");
             return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
@@ -124,6 +132,7 @@ public class UsuariosController {
 
     /**
      * Metodo para comprobar la validez del token
+     *
      * @param token
      * @return Nombre de usuario
      */
@@ -137,27 +146,29 @@ public class UsuariosController {
         return json.get("username").toString();
     }
 
-    /**
-     * Metodo para borrar un usuario mediente id
-     *
-     * @param id Identificador del usuario
-     */
-    @Secured("ROLE_ADMIN")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    @DeleteMapping("/{id}")
-    public ResponseEntity<?> delete(@PathVariable int id) {
-        Map<String, Object> response = new HashMap<>();
-        try {
-            usuariosService.delete(id);
-        } catch (DataAccessException e) {
-            response.put("error", "Error al elimiinar al usuario de la base de datos.");
-            log.error(e.getMessage() + ": " + e.getMostSpecificCause().getMessage());
-            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-        response.put("message","El usuario se ha eliminado correctamente.");
-
-        return new ResponseEntity<>(response, HttpStatus.CREATED);
-    }
+//    /**
+//     * Metodo para deshabilitar un usuario mediente id
+//     *
+//     * @param id Identificador del usuario
+//     */
+//    @Secured("ROLE_ADMIN")
+//    @ResponseStatus(HttpStatus.NO_CONTENT)
+//    @GetMapping("/disable/{id}")
+//    public ResponseEntity<?> delete(@PathVariable int id) {
+//        Map<String, Object> response = new HashMap<>();
+//        try {
+//            Usuario user = usuariosService.findById(id);
+//            user.setEnabled(false);
+//            usuariosService.save(user);
+//        } catch (DataAccessException e) {
+//            response.put("error", "Error al deshabilitar al usuario.");
+//            log.error(e.getMessage() + ": " + e.getMostSpecificCause().getMessage());
+//            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+//        }
+//        response.put("message","El usuario se ha deshabilitado correctamente.");
+//
+//        return new ResponseEntity<>(response, HttpStatus.CREATED);
+//    }
 
     /**
      * Metodo para crear un usuario
@@ -172,8 +183,8 @@ public class UsuariosController {
         //@Valid valida el usuario desde el propio body de la peticion
         Usuario user = null;
         Map<String, Object> response = new HashMap<>();
-        if(result.hasErrors()){
-            List<String> errors = result.getFieldErrors().stream().map(e-> ""+e.getDefaultMessage()).collect(Collectors.toList());
+        if (result.hasErrors()) {
+            List<String> errors = result.getFieldErrors().stream().map(e -> "" + e.getDefaultMessage()).collect(Collectors.toList());
             response.put("errors", errors);
             return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
         }
@@ -218,8 +229,8 @@ public class UsuariosController {
         Map<String, Object> response = new HashMap<>();
         try {
             Usuario usuarioBBDD = usuariosService.findById(id);
-            if(result.hasErrors()){
-                List<String> errors = result.getFieldErrors().stream().map(e->""+e.getDefaultMessage()).collect(Collectors.toList());
+            if (result.hasErrors()) {
+                List<String> errors = result.getFieldErrors().stream().map(e -> "" + e.getDefaultMessage()).collect(Collectors.toList());
                 response.put("errors", errors);
                 return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
             }
@@ -227,14 +238,13 @@ public class UsuariosController {
                 response.put("error", "No se puede editar, el usuario no existe.");
                 return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
             }
-            Usuario usuarioActualizado = null;
+            Usuario usuarioActualizado;
             usuarioBBDD.setImage(usuario.getImage());
             usuarioBBDD.setEnabled(usuario.getEnabled());
             usuarioBBDD.setUsername(usuario.getUsername());
             usuarioBBDD.setVerified(usuario.getVerified());
             usuarioBBDD.setEmail(usuario.getEmail());
             usuarioBBDD.setRegistrationDate(usuario.getRegistrationDate());
-//        usuarioBBDD.setPassword(usuario.getPassword());
             usuarioActualizado = usuariosService.save(usuarioBBDD);
             response.put("message", "El usuario " + usuario.getUsername() + " se ha actualizado correctamente.");
             response.put("user", usuarioActualizado);
@@ -261,6 +271,27 @@ public class UsuariosController {
         }
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
+
+    /**
+     * Metodo para actualizar los roles del usuario
+     *
+     * @param roles
+     * @param id
+     * @return
+     */
+    @Secured("ROLE_ADMIN")
+    @PostMapping("/set_roles/{id}")
+    public ResponseEntity<?> setRoles(@RequestBody ArrayList<String> roles, @PathVariable int id) {
+        log.info("Actualizando roles del usuario " + id);
+        Map<String, Object> response;
+        response = usuariosService.setRoles(roles, id);
+        if (response.containsKey("message")) {
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+        }
+    }
+
 
     /**
      * Metodo para enviar por correo un codigo de verificacion

@@ -74,7 +74,6 @@ public class CocheService implements ICocheService {
         Coche coche = this.cocheDAO.findById(idCoche).orElse(null);
         if (coche != null) {
             ConsumoNormal cm = getConsumoNormal(coche);
-            System.out.println(coche.getTipoMotor().getMotorCombustion().getIdMotorCombustion());
             Volumen vol = null;
             if (coche.getModelo().getVolumen() != null) {
                 vol = this.volumenDAO.findById(coche.getModelo().getVolumen().getIdVolumen()).orElse(null);
@@ -137,7 +136,6 @@ public class CocheService implements ICocheService {
             // Busca todos los coches que esten en el margen de precio
             List<Coche> coches = this.cocheDAO.findAllByPrecioIsGreaterThanEqualAndPrecioIsLessThanEqualAndAndCarroceria_Carroceria(
                     (int) (precio * (1 - MARGEN)), (int) (precio * (1 + MARGEN)), cocheSeleccionado.getCarroceria().getCarroceria());
-            System.out.println("Carroceria = "+cocheSeleccionado.getCarroceria().getCarroceria());
             List<Coche> aux = new ArrayList<>(); // Variable para eliminar los coches del array que coinciden con el modelo actual
             AtomicReference<Double> mediaPrecio = new AtomicReference<>((double) 0);
             AtomicReference<Double> mediaConsumoMix = new AtomicReference<>((double) 0);

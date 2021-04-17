@@ -16,9 +16,10 @@ public interface IFicherosService {
     HashMap<Integer, String> getURLMarcaLogo(int idMarca, boolean varias);
     HashMap<Integer, String> getURLModelosLogo(List<Integer> idsModelos);
     HashMap<Integer, String> getURLUsuario(List<Integer> idsUsuarios);
-    Path getPath(String nameImage);
-    boolean delete(String nameImage);
-    String copy(MultipartFile file) throws IOException;
+//    Path getPath(String nameImage);
+//    boolean delete(String nameImage);
+//    String copy(MultipartFile file) throws IOException;
+//    void deleteUser(int id);
     Resource loadModelo(String nameImage) throws MalformedURLException;
     void setURLUsuario(Usuario idUsuario);
     Resource loadPropietario() throws MalformedURLException;
