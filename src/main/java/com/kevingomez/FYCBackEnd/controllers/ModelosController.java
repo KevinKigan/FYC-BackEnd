@@ -67,6 +67,33 @@ public class ModelosController {
     }
 
     /**
+     * Metodo para guardar una marca
+     *
+     * @return Lista de Marcas
+     */
+    @Secured("ROLE_ADMIN")
+    @PostMapping("carrocerias_por_modelo")
+    public ResponseEntity<?> carroceriasPorModelo(@RequestBody List<Integer> idsModelos) {
+        Map<String, Object> response = new HashMap<>();
+        HashMap<Integer, String> map = this.modelosService.findAllCarroceriasPorModelo(idsModelos);
+//        if(marca.getMarcaCoche()!=null && !marca.getMarcaCoche().trim().equals("")) {
+//            log.info("Guardando marca actualizada");
+//            modelosService.saveMarca(marca);
+//            response.put("marca", marca);
+//            response.put("message", "Marca guardada correctamente.");
+//            return new ResponseEntity<>(response, HttpStatus.OK);
+//        }else{
+//            log.error("La marca no se ha podido guardar. Datos invalidos");
+//            response.put("error", "La marca no se ha podido guardar. Datos invalidos.");
+        response.put("carrocerias",map);
+        System.out.println("emitimos");
+            return new ResponseEntity<>(response, HttpStatus.OK);
+//        }
+    }
+
+
+
+    /**
      * Metodo para buscar todas las carrocerias
      *
      * @return Lista con todas las carrocerias

@@ -1,6 +1,7 @@
 package com.kevingomez.FYCBackEnd.models.DAO.Services.Interfaces;
 
 import com.dropbox.core.DbxException;
+import com.kevingomez.FYCBackEnd.models.entity.Coches.Marca;
 import com.kevingomez.FYCBackEnd.models.entity.Usuarios.Usuario;
 import org.springframework.core.io.Resource;
 import org.springframework.web.multipart.MultipartFile;
@@ -26,4 +27,6 @@ public interface IFicherosService {
 //    Resource load(String nameImage) throws MalformedURLException;
     String uploadFile(String area, MultipartFile file, String filename);
     Path downloadFile(String area, String filename) throws FileNotFoundException, DbxException, IOException;
+
+    void setURLMarca(Marca marca);
 }

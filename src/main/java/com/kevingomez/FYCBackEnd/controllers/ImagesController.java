@@ -1,8 +1,12 @@
 package com.kevingomez.FYCBackEnd.controllers;
 
 import com.dropbox.core.DbxException;
+import com.kevingomez.FYCBackEnd.models.DAO.Services.Interfaces.ICocheService;
 import com.kevingomez.FYCBackEnd.models.DAO.Services.Interfaces.IFicherosService;
+import com.kevingomez.FYCBackEnd.models.DAO.Services.Interfaces.IModelosService;
 import com.kevingomez.FYCBackEnd.models.DAO.Services.Interfaces.IUsuariosService;
+import com.kevingomez.FYCBackEnd.models.DAO.dao.Interfaces.IMarcaDAO;
+import com.kevingomez.FYCBackEnd.models.entity.Coches.Marca;
 import com.kevingomez.FYCBackEnd.models.entity.Usuarios.Usuario;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,6 +35,8 @@ public class ImagesController {
     private IFicherosService ficherosService;
     @Autowired
     private IUsuariosService usuariosService;
+    @Autowired
+    private IModelosService modelosService;
 
 
     /**
@@ -89,34 +95,61 @@ public class ImagesController {
     }
 
     @Secured("ROLE_USER")
-    @PostMapping("/upload")
-    public ResponseEntity<?> uploadImage(@RequestParam("file") MultipartFile file, @RequestParam("id") int id) {
+    @PostMapping("/upload/{area}")
+    public ResponseEntity<?> uploadImage(@RequestParam("file") MultipartFile file, @RequestParam("id") int id, @PathVariable("area") String area) {
         Map<String, Object> response = new HashMap<>();
-        Usuario user = usuariosService.findById(id);
-        if (user != null) {
-            if (!file.isEmpty()) {
-                String filename = user.getUsername().concat("."+Objects.requireNonNull(file.getOriginalFilename()).split("\\.")[1]);
-                String responseUpload = ficherosService.uploadFile("userImage", file, filename);
-                if (responseUpload.contains("correctamente")) {
-                    user.setImage(filename);
-                    // Actualizamos la url de la nueva imagen del usuario
+        if(area.equals("users")) {
+            Usuario user = usuariosService.findById(id);
+            if (user != null) {
+                if (!file.isEmpty()) {
+                    String filename = user.getUsername().concat("." + Objects.requireNonNull(file.getOriginalFilename()).split("\\.")[1]);
+                    String responseUpload = ficherosService.uploadFile("userImage", file, filename);
+                    if (responseUpload.contains("correctamente")) {
+                        user.setImage(filename);
+                        // Actualizamos la url de la nueva imagen del usuario
                         ficherosService.setURLUsuario(user);
-                    usuariosService.save(user);
-                    response.put("user", user);
-                    response.put("message", responseUpload);
-                    return new ResponseEntity<>(response, HttpStatus.CREATED);
+                        usuariosService.save(user);
+                        response.put("user", user);
+                        response.put("message", responseUpload);
+                        return new ResponseEntity<>(response, HttpStatus.CREATED);
+                    } else {
+                        response.put("error", responseUpload);
+                        return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+                    }
                 } else {
-                    response.put("error", responseUpload);
-                    return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+                    response.put("error", "Se ha enviado un fichero vacio.");
+                    return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
                 }
             } else {
-                response.put("error", "Se ha enviado un fichero vacio.");
+                response.put("error", "No se ha encontrado al usuario.");
                 return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
             }
-        }else{
-            response.put("error", "No se ha encontrado al usuario.");
-            return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
+        }else if(area.equals("marcas")) {
+            Marca marca = modelosService.findMarcaById(id);
+            if (marca != null) {
+                if (!file.isEmpty()) {
+                    String filename = marca.getMarcaCoche().concat("." + Objects.requireNonNull(file.getOriginalFilename()).split("\\.")[1]);
+                    String responseUpload = ficherosService.uploadFile("marcas", file, filename);
+                    if (responseUpload.contains("correctamente")) {
+                        // Actualizamos la url de la nueva imagen del usuario
+                        ficherosService.setURLMarca(marca);
+                        response.put("marca", marca);
+                        response.put("message", responseUpload);
+                        return new ResponseEntity<>(response, HttpStatus.CREATED);
+                    } else {
+                        response.put("error", responseUpload);
+                        return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+                    }
+                } else {
+                    response.put("error", "Se ha enviado un fichero vacio.");
+                    return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
+                }
+            } else {
+                response.put("error", "No se ha encontrado la marca.");
+                return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
+            }
         }
+        return null;
     }
 
     @Secured("ROLE_USER")

@@ -1,11 +1,12 @@
 package com.kevingomez.FYCBackEnd.models.DAO.Services.Impl;
 
-import com.kevingomez.FYCBackEnd.controllers.CochesController;
 import com.kevingomez.FYCBackEnd.models.DAO.Services.Interfaces.IModelosService;
 import com.kevingomez.FYCBackEnd.models.DAO.dao.Interfaces.ICarroceriaDAO;
+import com.kevingomez.FYCBackEnd.models.DAO.dao.Interfaces.ICocheDAO;
 import com.kevingomez.FYCBackEnd.models.DAO.dao.Interfaces.IMarcaDAO;
 import com.kevingomez.FYCBackEnd.models.DAO.dao.Interfaces.IModeloDAO;
 import com.kevingomez.FYCBackEnd.models.entity.Coches.Carroceria;
+import com.kevingomez.FYCBackEnd.models.entity.Coches.Coche;
 import com.kevingomez.FYCBackEnd.models.entity.Coches.Marca;
 import com.kevingomez.FYCBackEnd.models.entity.Coches.Modelo;
 import org.slf4j.Logger;
@@ -18,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
 
 @Service
 public class ModelosService implements IModelosService {
@@ -29,6 +31,8 @@ public class ModelosService implements IModelosService {
     private ICarroceriaDAO carroceriaDAO;
     @Autowired
     private IModeloDAO modeloDAO;
+    @Autowired
+    private ICocheDAO cocheDAO;
 
     /**
      * Metodo para retornar todas las marcas
@@ -75,6 +79,18 @@ public class ModelosService implements IModelosService {
         return modeloDAO.findById(id).orElse(null);
     }
 
+
+    /**
+     * Metodo para retornar una marca segun su id
+     *
+     * @param id Id de la marca a retornar
+     * @return Marca con id especificado
+     */
+    @Override
+    public Marca findMarcaById(int id) {
+        return marcaDAO.findById(id).orElse(null);
+    }
+
     /**
      * Metodo para retornar una pagina con modelos
      *
@@ -117,6 +133,13 @@ public class ModelosService implements IModelosService {
     public HashMap<String,String> findImagen(String modelo, String marca) {
         HashMap<String,String> map = new HashMap();
         map.put("imagen",this.modeloDAO.findByModeloAndMarca_MarcaCoche(modelo, marca).getImagen());
+        return map;
+    }
+
+    @Override
+    public HashMap<Integer, String> findAllCarroceriasPorModelo(List<Integer> idsModelos) {
+        HashMap<Integer, String> map = new HashMap<>();
+        idsModelos.forEach(idModelo -> map.put(idModelo,this.cocheDAO.findTop1ByModelo_IdModelo(idModelo).getCarroceria().getCarroceria()));
         return map;
     }
 

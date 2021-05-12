@@ -5,6 +5,8 @@ import com.kevingomez.FYCBackEnd.models.entity.Coches.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.*;
 
@@ -42,10 +44,27 @@ public class CochesController {
     }
 
 
+    /**
+     * Metodo para retornar los precios de los modelos solicitados
+     * @param idsModelos
+     * @return
+     */
     @PostMapping("precios")
     public HashMap<String, String> preciosModelos(@RequestBody List<Integer> idsModelos) {
         log.info("Buscando todos los precios de los coches segun la lista de modelos");
         return cocheService.findAllPreciosList(idsModelos);
+    }
+
+
+    @PostMapping("tipos_motores")
+    public ResponseEntity<?> findTiposMotor(@RequestBody List<Integer> idsTiposMotor) {
+        Map<String, Object> response = new HashMap<>();
+        log.info("Buscando los tipos de motor segun lista de ids");
+        HashMap<Integer, TipoMotor> map = new HashMap<>();
+        List<TipoMotor> tiposmotores = cocheService.findAllTipoMotorByIds(idsTiposMotor);
+        tiposmotores.forEach(tipoMotor -> map.put(tipoMotor.getIdTipoMotor(), tipoMotor));
+        response.put("tipos_motores",map);
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
 
@@ -129,9 +148,6 @@ public class CochesController {
         log.info("Buscando MotorCombustion con id "+id);
         return cocheService.findMotorElectricoById(id);
     }
-
-
-
 
 
 

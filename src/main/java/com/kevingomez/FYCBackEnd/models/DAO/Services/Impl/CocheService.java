@@ -451,6 +451,10 @@ public class CocheService implements ICocheService {
 //        return coches.get(0);
     }
 
+    @Override
+    public List<TipoMotor> findAllTipoMotorByIds(List<Integer> idsTiposMotor) {
+        return this.tipoMotorDAO.findAllById(idsTiposMotor);
+    }
 
 
     private ConsumoNormal getConsumoNormal(Coche coche) {

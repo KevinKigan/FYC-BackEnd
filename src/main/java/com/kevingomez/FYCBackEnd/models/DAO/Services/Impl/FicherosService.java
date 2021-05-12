@@ -11,6 +11,7 @@ import com.dropbox.core.v2.files.ListFolderResult;
 import com.dropbox.core.v2.files.Metadata;
 import com.dropbox.core.v2.sharing.SharedLinkMetadata;
 import com.kevingomez.FYCBackEnd.models.DAO.dao.Interfaces.IUsuarioDAO;
+import com.kevingomez.FYCBackEnd.models.entity.Coches.Marca;
 import com.kevingomez.FYCBackEnd.models.entity.Usuarios.Usuario;
 import org.aspectj.weaver.IUnwovenClassFile;
 import org.json.simple.JSONObject;
@@ -64,6 +65,7 @@ public class FicherosService implements IFicherosService {
     private final String LINKS_MODELOS = "sharedlinksModelos.json";
     private final String LINKS_USUARIOS = "sharedlinksUsuarios.json";
     private final String PATH_USUARIOS = "/files/usuarios/";
+    private final String PATH_MARCAS = "/files/marcas/";
     private final String PATH_LINKS = "/files/links/";
     private static String tipo;
     private DbxClientV2 client;
@@ -96,7 +98,6 @@ public class FicherosService implements IFicherosService {
 //
 //    }
 
-
     /**
      * Metodo para subir un archivo a dropbox
      */
@@ -104,15 +105,6 @@ public class FicherosService implements IFicherosService {
         try {
             HashMap<String, String> paths = getLocalAndRemotePaths(area);
             String pathRemote = paths.get("remote");
-//            String pathRemote = "";
-//            switch (area) {
-//                case "userImage":
-//                    pathRemote = PATH_USUARIOS;
-//                    break;
-//                case "links":
-//                    pathRemote = PATH_LINKS;
-//                    break;
-//            }
             DbxClientV2 client = createClient();
             if (filename.equals("")) {
                 filename = file.getOriginalFilename();
@@ -129,6 +121,7 @@ public class FicherosService implements IFicherosService {
                     if (remoteNameWithoutDot.equals(filename.split("\\.")[0])) {
                         client.files().deleteV2(pathRemote + remoteNameWithDot);
                         breakWhile = true;
+                        break;
                     }
                 }
                 if (!result.getHasMore() || breakWhile) {
@@ -199,6 +192,9 @@ public class FicherosService implements IFicherosService {
                 paths.put("remote",PATH_LINKS);
                 paths.put("local",Paths.get("src/main/resources/static/linkfiles/").toAbsolutePath().toString());
                 break;
+            case "marcas":
+                paths.put("remote",PATH_MARCAS);
+                break;
         }
         return paths;
     }
@@ -217,17 +213,6 @@ public class FicherosService implements IFicherosService {
         HashMap<String, String> paths = getLocalAndRemotePaths(area);
         String pathRemote = paths.get("remote");
         String localPath = paths.get("local");
-//        switch (area) {
-//            case "userImage":
-//                pathRemote = PATH_USUARIOS;
-//                localPath = Paths.get("src/main/resources/static/users/").toAbsolutePath().toString();
-//                break;
-//            case "links":
-//                pathRemote = PATH_LINKS;
-//                localPath = Paths.get("src/main/resources/static/linkfiles/").toAbsolutePath().toString();
-//                break;
-//
-//        }
         DbxClientV2 client = createClient();
         File dir = new File(localPath);
         if (!dir.exists()) dir.mkdirs();
@@ -242,6 +227,35 @@ public class FicherosService implements IFicherosService {
         log.info("Fichero " + filename + " descargado");
         outputStream.close();
         return Paths.get(localPath);
+
+    }
+
+    @Override
+    public void setURLMarca(Marca marca) {
+        int id = marca.getIdMarca();
+        Object obj = retrieveLinkFile(LINKS_MARCAS);
+        JSONObject jsonObject = (JSONObject) obj;
+        JSONObject finalJsonObject = (JSONObject) jsonObject.get("linkmarcas");
+        try {
+            SharedLinkMetadata sharedLinkMetadata;
+            sharedLinkMetadata = client.sharing().createSharedLinkWithSettings(PATH_MARCAS + marca.getMarcaCoche()+".png");
+
+            if (finalJsonObject.getOrDefault(String.valueOf(id), null) != null) {
+                // Si la marca ya tenia imagen
+                ((JSONObject) finalJsonObject.get(Integer.toString(id))).replace("url", sharedLinkMetadata.getUrl().replace("https://www.dropbox.com/", "https://dl.dropboxusercontent.com/"));
+            } else {
+                // Si es la primera imagen de la marca
+                String stringID = String.valueOf(id);
+                JSONObject newObj = new JSONObject();
+                newObj.put("id", stringID);
+                newObj.put("url", sharedLinkMetadata.getUrl().replace("https://www.dropbox.com/", "https://dl.dropboxusercontent.com/"));
+                finalJsonObject.put(stringID, newObj);
+            }
+            saveFileLocaleAndRemote(jsonObject, LINKS_MARCAS);
+
+        } catch (DbxException e) {
+            log.error("Error al actualizar la imagen de la marca en los ficheros " + LINKS_MARCAS);
+        }
 
     }
 
