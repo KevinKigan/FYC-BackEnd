@@ -21,4 +21,25 @@ public interface ICocheService {
     ArrayList generateDataVolumenCarroceria(int idCarroceria);
 
     List<TipoMotor> findAllTipoMotorByIds(List<Integer> idsTiposMotor);
+    TipoMotor findTipoMotorById(int id);
+
+    Consumo findConsumoById(Integer id);
+
+    Emisiones getEmisionesById(int id);
+
+    List<TipoCombustible> findAllTipoCombustible();
+
+    List<TipoEmisiones> findAllNormativasConsumos();
+
+    Coche save(Coche coche);
+
+    MotorCombustion saveMotorCombustion(MotorCombustion motorCombustion);
+
+    Consumo saveConsumo(Consumo consumo);
+
+    Volumen findVolumenById(int id);
+
+    MotorElectrico saveMotorElectrico(MotorElectrico motorElectrico);
+
+    Volumen saveVolumen(Volumen volumen);
 }

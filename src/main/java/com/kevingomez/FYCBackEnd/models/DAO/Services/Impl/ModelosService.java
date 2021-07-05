@@ -143,4 +143,9 @@ public class ModelosService implements IModelosService {
         return map;
     }
 
+    @Override
+    public Modelo findByModeloAndMarca_MarcaCoche(String marca, String modelo_str) {
+        return modeloDAO.findByModeloAndMarca_MarcaCoche(modelo_str, marca);
+    }
+
 }

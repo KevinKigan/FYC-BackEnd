@@ -40,26 +40,6 @@ public class ImagesController {
 
 
     /**
-     * Metodo para obtener la foto del propietario
-     *
-     * @return
-     */
-    @GetMapping("propietario")
-    public ResponseEntity<Resource> showPropietario() {
-        log.info("Buscando imagen del propietario");
-        Resource resource = null;
-        HttpHeaders headers = new HttpHeaders();
-        try {
-            resource = ficherosService.loadPropietario();
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-        }
-        headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + resource.getFilename() + "\"");
-        return new ResponseEntity<>(resource, headers, HttpStatus.OK);
-
-    }
-
-    /**
      * Metodo para obtener el logo de las marca
      *
      * @return Logo de la marca

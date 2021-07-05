@@ -71,7 +71,6 @@ public class ModelosController {
      *
      * @return Lista de Marcas
      */
-    @Secured("ROLE_ADMIN")
     @PostMapping("carrocerias_por_modelo")
     public ResponseEntity<?> carroceriasPorModelo(@RequestBody List<Integer> idsModelos) {
         Map<String, Object> response = new HashMap<>();
@@ -86,7 +85,6 @@ public class ModelosController {
 //            log.error("La marca no se ha podido guardar. Datos invalidos");
 //            response.put("error", "La marca no se ha podido guardar. Datos invalidos.");
         response.put("carrocerias",map);
-        System.out.println("emitimos");
             return new ResponseEntity<>(response, HttpStatus.OK);
 //        }
     }
@@ -143,6 +141,18 @@ public class ModelosController {
     public Page<Modelo> findModelosPage(@PathVariable Integer pageSize, @PathVariable Integer page) {
         log.info("Buscando la pagina "+page+" de modelos con "+pageSize+" elementos");
         return modelosService.findAllModelos(PageRequest.of(page, pageSize));
+    }
+
+    /**
+     * Metodo para retornar una pagina con un numero de modelos
+     *
+     * @return Pagina de modelos
+     */
+    @GetMapping("")
+    public Modelo findModelosPage(@RequestParam(value = "marca_str") String marca, @RequestParam(value = "modelo_str") String modelo_str) {
+        log.info("Buscando modelo con nombre "+modelo_str+" de marca con marca"+marca);
+        Modelo m = modelosService.findByModeloAndMarca_MarcaCoche(marca, modelo_str);
+        return m;
     }
 
     /**

@@ -21,4 +21,6 @@ public interface IModelosService {
     List<Modelo> findAllModelosPorMarca(int idMarca);
     HashMap<String,String> findImagen(String modelo, String marca);
     HashMap<Integer, String> findAllCarroceriasPorModelo(List<Integer> idsModelos);
+
+    Modelo findByModeloAndMarca_MarcaCoche(String marca, String modelo_str);
 }

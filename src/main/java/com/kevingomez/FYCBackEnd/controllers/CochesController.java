@@ -5,8 +5,10 @@ import com.kevingomez.FYCBackEnd.models.entity.Coches.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 import java.util.*;
 
@@ -30,6 +32,23 @@ public class CochesController {
         return cocheService.findAllCocheByIdModelo(idModelo);
     }
 
+    @Secured("ROLE_ADMIN")
+    @PostMapping("save")
+    public ResponseEntity<?> save(@RequestBody Coche coche) {
+        log.info("Guardando el coche "+coche.getIdCoche()+" en la base de datos ");
+        Map<String, Object> response = new HashMap<>();
+        Coche cocheSaved;
+        try {
+            cocheSaved = cocheService.save(coche);
+        } catch (DataAccessException e) {
+            response.put("error", "Error al insertar al usuario en la base de datos.");
+            log.error(e.getMessage() + ": " + e.getMostSpecificCause().getMessage());
+            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        response.put("message", "Vehiculo guardado correctamente.");
+        response.put("coche", cocheSaved);
+        return new ResponseEntity<>(response, HttpStatus.CREATED);
+    }
 
     /**
      * Metodo para retornar el coche segun el id especificado
@@ -67,6 +86,24 @@ public class CochesController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
+    @GetMapping("tipos_combustibles")
+    public ResponseEntity<?> findTiposCombustibles() {
+        Map<String, Object> response = new HashMap<>();
+        log.info("Buscando los tipos de combustibles");
+        List<TipoCombustible> tiposCombustibles = cocheService.findAllTipoCombustible();
+        response.put("tipos_combustibles",tiposCombustibles);
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @GetMapping("normativas_consumos")
+    public ResponseEntity<?> findNormativasConsumos() {
+        Map<String, Object> response = new HashMap<>();
+        log.info("Buscando las normativas de los consumos");
+        List<TipoEmisiones> normativas = cocheService.findAllNormativasConsumos();
+        response.put("normativas",normativas);
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
 
     /**
      * *****************************************************************************************************************
@@ -74,10 +111,44 @@ public class CochesController {
      * *****************************************************************************************************************
      */
 
+    /**
+     * Metodo para obtener todos los consumos segun una lista de ids
+     * @param idsConsumos Lista de ids buscados
+     * @return Lista de ids buscados
+     */
     @PostMapping("consumo")
     public List<Consumo> findAllConsumosById(@RequestBody List<Integer>idsConsumos){
         log.info("Buscando los consumos segun una lista de ids");
         return this.cocheService.findAllConsumosById(idsConsumos);
+    }
+
+    /**
+     * Metodo para guardar el consumo
+     * @param consumo
+     * @return
+     */
+    @Secured("ROLE_ADMIN")
+    @PostMapping("consumo/save")
+    public ResponseEntity<?> saveConsumo(@RequestBody Consumo consumo){
+        log.info("Guardando el consumo con id "+consumo.getIdConsumo()+" en la base de datos.");
+        Map<String, Object> response = new HashMap<>();
+        Consumo consumoSaved;
+        try {
+            consumoSaved = this.cocheService.saveConsumo(consumo);
+        } catch (DataAccessException e) {
+            response.put("error", "Error al guardar el consumo en la base de datos.");
+            log.error(e.getMessage() + ": " + e.getMostSpecificCause().getMessage());
+            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        response.put("message", "Vehiculo guardado correctamente.");
+        response.put("consumo", consumoSaved);
+        return new ResponseEntity<>(response, HttpStatus.CREATED);
+    }
+
+    @GetMapping("consumo/{id}")
+    public Consumo findConsumoById(@PathVariable Integer id){
+        log.info("Buscando el consumos con id "+ id);
+        return this.cocheService.findConsumoById(id);
     }
 
     /**
@@ -96,6 +167,23 @@ public class CochesController {
         log.info("Buscando todos los motores de combustion");
         return cocheService.findAllMotorCombustion();
     }
+    @Secured("ROLE_ADMIN")
+    @PostMapping("combustion/save")
+    public ResponseEntity<?> save(@RequestBody MotorCombustion motorCombustion) {
+        log.info("Guardando el motor de combustion "+motorCombustion.getIdMotorCombustion()+" en la base de datos ");
+        Map<String, Object> response = new HashMap<>();
+        MotorCombustion motorCombustionSaved;
+        try {
+            motorCombustionSaved = cocheService.saveMotorCombustion(motorCombustion);
+        } catch (DataAccessException e) {
+            response.put("error", "Error al guardar el motor de combustion en la base de datos.");
+            log.error(e.getMessage() + ": " + e.getMostSpecificCause().getMessage());
+            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        response.put("message", "Vehiculo guardado correctamente.");
+        response.put("motorCombustion", motorCombustionSaved);
+        return new ResponseEntity<>(response, HttpStatus.CREATED);
+    }
 
     /**
      * Metodo para retornar el motor de combustion segun el id especificado
@@ -108,6 +196,18 @@ public class CochesController {
         log.info("Buscando MotorCombustion con id "+id);
         return cocheService.findMotorCombustionById(id);
     }
+
+    /**
+     * Metodo para retornar el motor de combustion segun el id de TipoMotor especificado
+     *
+     * @param id ID del Tipo Motor
+     * @return Motor de combustion
+     */
+    @GetMapping("tipo_motor/{id}")
+    public TipoMotor getTipoMotorById(@PathVariable int id) {
+        log.info("Buscando TipoMotor con id "+id);
+        return cocheService.findTipoMotorById(id);
+    }
     /**
      * Metodo para retornar la lista de motores de combustion segun los ids especificados
      *
@@ -118,6 +218,18 @@ public class CochesController {
     public List<MotorCombustion> getAllMotorCombustionByIds(@RequestBody List<Integer> idsMotorCombustion) {
         log.info("Buscando motores de combustion por lista de ids");
         return cocheService.getAllMotorCombustionByIds(idsMotorCombustion);
+    }
+
+    /**
+     * Metodo para retornar las emisiones de un motor segun el id especificado
+     *
+     * @param id ID de las emisiones
+     * @return Emisiones
+     */
+    @GetMapping("emisiones/{id}")
+    public Emisiones getEmisionesById(@PathVariable int id) {
+        log.info("Buscando motores de combustion por lista de ids");
+        return cocheService.getEmisionesById(id);
     }
 
     /**
@@ -149,7 +261,74 @@ public class CochesController {
         return cocheService.findMotorElectricoById(id);
     }
 
+    /**
+     * Metodo para guardar el motor electrico
+     *
+     * @param motorElectrico motorElectrico
+     * @return Motor electrico guardado
+     */
+    @Secured("ROLE_ADMIN")
+    @PostMapping("electrico/save")
+    public ResponseEntity<?> saveMotorElectrico(@RequestBody MotorElectrico motorElectrico) {
+        log.info("Guardando motor electrico");
+        Map<String, Object> response = new HashMap<>();
+        MotorElectrico motorElectricoSaved;
+        try {
+            motorElectricoSaved = cocheService.saveMotorElectrico(motorElectrico);
+        } catch (DataAccessException e) {
+            response.put("error", "Error al guardar el motor electrico en la base de datos.");
+            log.error(e.getMessage() + ": " + e.getMostSpecificCause().getMessage());
+            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        response.put("message", "Vehiculo guardado correctamente.");
+        response.put("motorElectrico", motorElectricoSaved);
+        return new ResponseEntity<>(response, HttpStatus.CREATED);
+    }
 
+
+
+
+    /**
+     * *****************************************************************************************************************
+     *                                                 Volumen
+     * *****************************************************************************************************************
+     */
+
+    /**
+     * Metodo para retornar el volumen segun el id especificado
+     *
+     * @param id ID del volumen
+     * @return Volumen con el id espeficicado
+     */
+    @GetMapping("volumen/{id}")
+    public Volumen getVolumenById(@PathVariable int id) {
+        log.info("Buscando volumen con id "+id);
+        return cocheService.findVolumenById(id);
+    }
+
+    /**
+     * Metodo para guardar el volumen
+     *
+     * @param volumen Volumen a guardar
+     * @return Volumen guardado
+     */
+    @Secured("ROLE_ADMIN")
+    @PostMapping("volumen/save")
+    public ResponseEntity<?> saveVolumen(@RequestBody Volumen volumen) {
+        log.info("Guardando volumen");
+        Map<String, Object> response = new HashMap<>();
+        Volumen volumenSaved;
+        try {
+            volumenSaved = cocheService.saveVolumen(volumen);
+        } catch (DataAccessException e) {
+            response.put("error", "Error al guardar el volumen en la base de datos.");
+            log.error(e.getMessage() + ": " + e.getMostSpecificCause().getMessage());
+            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        response.put("message", "Vehiculo guardado correctamente.");
+        response.put("volumen", volumenSaved);
+        return new ResponseEntity<>(response, HttpStatus.CREATED);
+    }
 
     /**
      * *****************************************************************************************************************

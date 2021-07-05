@@ -24,13 +24,13 @@ public class MotorElectrico implements Serializable {
      * unico del motor y los mismos identificadores unicos de pontencias. Aplica el mismo ejemplo
      * para los hp (horsepower, caballos de potencia en ingles)
      */
-    @OneToMany(fetch = FetchType.LAZY)
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JsonIgnoreProperties(value={"idPotenciaElectrica","hibernateLazyInitializer","handler"}, allowSetters = true)
     @JoinTable(name = "motores_electricos_potencias_electrica", joinColumns=@JoinColumn(name = "motor_electrico_id"),
             inverseJoinColumns = @JoinColumn(name = "potencia_electrica_id"))
     private List<PotenciaElectrica> potenciasElectricas;
 
-    @OneToMany(fetch = FetchType.LAZY)
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JsonIgnoreProperties(value={"idHP","hibernateLazyInitializer","handler"}, allowSetters = true)
     @JoinTable(name = "motores_electricos_hp", joinColumns=@JoinColumn(name = "motor_electrico_id"),
             inverseJoinColumns = @JoinColumn(name = "hp_id"))

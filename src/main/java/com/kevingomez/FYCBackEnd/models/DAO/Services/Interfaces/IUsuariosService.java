@@ -18,4 +18,6 @@ public interface IUsuariosService {
     Usuario findByEmail(String email);
     HashMap<String, Object> setRoles(ArrayList<String> roles, int id);
     List<Usuario> findAll();
+
+    Usuario create(Usuario usuario);
 }

@@ -30,11 +30,14 @@ public class ResourceServerConfig extends ResourceServerConfigurerAdapter {
                         HttpMethod.GET,
                         "/api/modelos/**",
                         "/api/coches/**",
+                        "/api/user/**",
                         "/api/img/marcaslogo/**").permitAll()
                 .antMatchers(
                         HttpMethod.POST,
                         "/api/img/modeloslogo",
+                        "/api/modelos/**",
                         "/api/coches/precios",
+                        "/api/user/**",
                         "/api/coches/**").permitAll()
                 .anyRequest().authenticated()
                 .and().cors().configurationSource(corsConfigurationSource());

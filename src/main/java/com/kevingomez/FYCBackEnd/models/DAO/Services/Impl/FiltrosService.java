@@ -387,7 +387,7 @@ public class FiltrosService implements IFiltrosService {
         List<Emisiones> emisionesList = this.emisionesDAO.findAllByCO2IsLessThanEqual(emisiones.getEmisiones());
         List<Emisiones> tipoEmisionesList = new ArrayList<>();
         if (!emisiones.getTipoEmisiones().equals(CUALQUIERA)) tipoEmisionesList = this.emisionesDAO.
-                findAllByTipoEmisones_IdTipoEmisiones(
+                findAllByTipoEmisiones_IdTipoEmisiones(
                         this.tipoEmisionesDAO.findByTipoEmisiones(emisiones.getTipoEmisiones())
                                 .getIdTipoEmisiones()
                 );

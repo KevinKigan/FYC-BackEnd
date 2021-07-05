@@ -176,7 +176,6 @@ public class UsuariosController {
      * @param usuario Usuario a crear
      * @return Usuario creado
      */
-    @Secured("ROLE_ADMIN")
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping("create")
     public ResponseEntity<?> create(@Valid @RequestBody Usuario usuario, BindingResult result) {
@@ -190,7 +189,7 @@ public class UsuariosController {
         }
         try {
             usuario.setEnabled(true);
-            user = usuariosService.save(usuario);
+            user = usuariosService.create(usuario);
             //todo
         } catch (DataAccessException e) {
             if (Objects.requireNonNull(e.getMostSpecificCause().getMessage()).contains("Duplicate entry")) {
@@ -334,7 +333,7 @@ public class UsuariosController {
     public ResponseEntity<?> checkVerificationCode(@PathVariable int id, @PathVariable String code) {
         Map<String, Object> response = new HashMap<>();
         String status = this.usuariosService.comprobarVerificado(id, code);
-        if (status.equals("Verificado")) {
+        if (status.equals("Verificado.")) {
             response.put("message", status);
         } else {
             response.put("error", status);

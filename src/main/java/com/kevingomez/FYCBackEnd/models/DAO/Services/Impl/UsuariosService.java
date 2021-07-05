@@ -17,6 +17,7 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -34,13 +35,24 @@ public class UsuariosService implements IUsuariosService, UserDetailsService {
     private IUsuarioDAO usuarioDAO;
     @Autowired
     private IRolDAO rolDAO;
+    @Autowired
+    private BCryptPasswordEncoder passwordEncoder;
 
     private HashMap<Integer, Verificacion> verificacionEnProceso= new HashMap<>();
 
     @Override
     @Transactional
-    public Usuario save(Usuario user) {
-        return usuarioDAO.save(user);
+    public Usuario save(Usuario user) {return usuarioDAO.save(user);}
+
+    @Override
+    @Transactional
+    public Usuario create(Usuario user) {
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        Usuario userBBDD = usuarioDAO.save(user);
+        ArrayList<String> rol = new ArrayList();
+        rol.add("ROLE_USER");
+        setRoles(rol, user.getId());
+        return userBBDD;
     }
 
     @Override
