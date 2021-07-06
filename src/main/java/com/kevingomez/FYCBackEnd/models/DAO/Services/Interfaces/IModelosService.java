@@ -23,4 +23,6 @@ public interface IModelosService {
     HashMap<Integer, String> findAllCarroceriasPorModelo(List<Integer> idsModelos);
 
     Modelo findByModeloAndMarca_MarcaCoche(String marca, String modelo_str);
+
+    Modelo save(Modelo modelo);
 }

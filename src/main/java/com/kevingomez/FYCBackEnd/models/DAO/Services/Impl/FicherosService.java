@@ -12,8 +12,8 @@ import com.dropbox.core.v2.files.Metadata;
 import com.dropbox.core.v2.sharing.SharedLinkMetadata;
 import com.kevingomez.FYCBackEnd.models.DAO.dao.Interfaces.IUsuarioDAO;
 import com.kevingomez.FYCBackEnd.models.entity.Coches.Marca;
+import com.kevingomez.FYCBackEnd.models.entity.Coches.Modelo;
 import com.kevingomez.FYCBackEnd.models.entity.Usuarios.Usuario;
-import org.aspectj.weaver.IUnwovenClassFile;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
@@ -32,13 +32,12 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.*;
 import java.net.MalformedURLException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.UUID;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
 @Service
@@ -66,6 +65,7 @@ public class FicherosService implements IFicherosService {
     private final String LINKS_USUARIOS = "sharedlinksUsuarios.json";
     private final String PATH_USUARIOS = "/files/usuarios/";
     private final String PATH_MARCAS = "/files/marcas/";
+    private final String PATH_MODELOS = "/files/modelos/";
     private final String PATH_LINKS = "/files/links/";
     private static String tipo;
     private DbxClientV2 client;
@@ -85,31 +85,33 @@ public class FicherosService implements IFicherosService {
         }
     }
 
-//    @Override
-//    public void deleteUser(int id){
-//        Object obj = retrieveLinkFile(LINKS_USUARIOS);
-//        JSONObject jsonObject = (JSONObject) obj;
-//        JSONObject finalJsonObject = (JSONObject) jsonObject.get("linkusuarios");
-//        if (finalJsonObject.getOrDefault(String.valueOf(id), null) != null) {
-//            // Si el usuario ya tenia foto de perfil
-//            finalJsonObject.remove(Integer.toString(id));
-//            saveFileLocaleAndRemote(jsonObject, LINKS_USUARIOS);
-//        }
-//
-//    }
-
     /**
      * Metodo para subir un archivo a dropbox
      */
-    public String uploadFile(String area, MultipartFile file, String filename) {
+    public String uploadFile(String area, MultipartFile file, String filename, Modelo modelo) {
         try {
             HashMap<String, String> paths = getLocalAndRemotePaths(area);
             String pathRemote = paths.get("remote");
+            if(area.equals("modelos")) pathRemote = pathRemote + modelo.getMarca().getMarcaCoche() + "/";
             DbxClientV2 client = createClient();
             if (filename.equals("")) {
                 filename = file.getOriginalFilename();
             }
             //Comprobarmos si ya se encuentra el archivo repetido y borramos el antiguo
+
+            if(modelo != null) {
+                AtomicBoolean bool = new AtomicBoolean(false);
+                List<Metadata> result2 = client.files().listFolder(PATH_MODELOS).getEntries();
+                result2.forEach(metadata -> {
+                    String[] folder = metadata.getPathDisplay().split(PATH_MODELOS);
+                    if (folder[1].equals(modelo.getMarca().getMarcaCoche())) {
+                        bool.set(true);
+                    }
+                });
+                if (!bool.get()) {
+                    client.files().createFolderV2(PATH_MODELOS + modelo.getMarca().getMarcaCoche());
+                }
+            }
             ListFolderResult result = client.files().listFolder(pathRemote);
             boolean breakWhile = false;
             while (true) {
@@ -130,6 +132,9 @@ public class FicherosService implements IFicherosService {
 
                 result = client.files().listFolderContinue(result.getCursor());
             }
+            if(modelo != null && !modelo.getImagen().equals("defaultImage")){
+                client.files().deleteV2(pathRemote + modelo.getImagen());
+            }
             client.files().uploadBuilder(pathRemote + filename).uploadAndFinish(file.getInputStream());
             log.info("Fichero subido correctamente.");
             return "Fichero subido correctamente.";
@@ -143,38 +148,6 @@ public class FicherosService implements IFicherosService {
         }
     }
 
-//    public Path getFile(String area, String filename) throws IOException, DbxException {
-////        try {
-//            return downloadFile(area, filename);
-//
-////            DbxClientV2 client = createClient();
-////
-////            File dir = new File(localPath);
-////            if (!dir.exists()) dir.mkdirs();
-////            localPath += "/" + filename;
-////            OutputStream outputStream = null;
-////            try {
-////                outputStream = new FileOutputStream(localPath);
-////            } catch (FileNotFoundException e) {
-////                log.error(e.getCause().getMessage());
-////            }
-////            try {
-////                FileMetadata metadata = client.files()
-////                        .downloadBuilder(pathRemote + filename)
-////                        .download(outputStream);
-////            } catch (DbxException | IOException e) {
-////                e.printStackTrace();
-////            }
-////            log.info("Fichero " + filename + " descargado");
-////            } catch (IOException e) {
-////            log.error(e.getMessage().concat(": ").concat(e.getCause().getMessage()));
-//////            return e.getMessage().concat(": ").concat(e.getCause().getMessage());
-////        } catch (DbxException e) {
-////            log.error("Error al conectarse al servidor de archivos");
-//////            return "Error al conectarse al servidor de archivos";
-////        }
-//
-//    }
 
     /**
      * Metodo para obtener los path local y remoto
@@ -194,6 +167,9 @@ public class FicherosService implements IFicherosService {
                 break;
             case "marcas":
                 paths.put("remote",PATH_MARCAS);
+                break;
+            case "modelos":
+                paths.put("remote",PATH_MODELOS);
                 break;
         }
         return paths;
@@ -219,11 +195,6 @@ public class FicherosService implements IFicherosService {
         localPath += "/" + filename;
         OutputStream outputStream = new FileOutputStream(localPath);
         FileMetadata metadata = client.files().downloadBuilder(pathRemote + filename).download(outputStream);
-//        } catch (FileNotFoundException e) {
-//            log.error(e.getCause().getMessage());
-//        } catch (DbxException | IOException e) {
-//            e.printStackTrace();
-//        }
         log.info("Fichero " + filename + " descargado");
         outputStream.close();
         return Paths.get(localPath);
@@ -259,6 +230,35 @@ public class FicherosService implements IFicherosService {
 
     }
 
+    @Override
+    public void setURLModelo(Modelo modelo, String filename) {
+        int id = modelo.getIdModelo();
+        Object obj = retrieveLinkFile(LINKS_MODELOS);
+        JSONObject jsonObject = (JSONObject) obj;
+        JSONObject finalJsonObject = (JSONObject) jsonObject.get("linkmodelos");
+        try {
+            SharedLinkMetadata sharedLinkMetadata;
+            sharedLinkMetadata = client.sharing().createSharedLinkWithSettings(PATH_MODELOS +modelo.getMarca().getMarcaCoche() + "/" + filename);
+
+            if (finalJsonObject.getOrDefault(String.valueOf(id), null) != null) {
+                // Si la marca ya tenia imagen
+                ((JSONObject) finalJsonObject.get(Integer.toString(id))).replace("url", sharedLinkMetadata.getUrl().replace("https://www.dropbox.com/", "https://dl.dropboxusercontent.com/"));
+            } else {
+                // Si es la primera imagen de la marca
+                String stringID = String.valueOf(id);
+                JSONObject newObj = new JSONObject();
+                newObj.put("idModelo", stringID);
+                newObj.put("url", sharedLinkMetadata.getUrl().replace("https://www.dropbox.com/", "https://dl.dropboxusercontent.com/"));
+                finalJsonObject.put(stringID, newObj);
+            }
+            saveFileLocaleAndRemote(jsonObject, LINKS_MODELOS);
+
+        } catch (DbxException e) {
+            log.error("Error al actualizar la imagen del modelo en los ficheros " + LINKS_MODELOS);
+        }
+
+    }
+
     /**
      * Metodo para recuperar el fichero de links
      *
@@ -290,26 +290,6 @@ public class FicherosService implements IFicherosService {
     @Override
     @Transactional(readOnly = true) //Select solo de lectura
     public HashMap<Integer, String> getURLMarcaLogo(int idMarca, boolean varias) {
-
-        //TODO para crear enlace compartido cuando se añade una nueva marca con dropbox
-//            Marca marca = marcaDAO.findById(idMarca).orElse(null);
-//            SharedLinkMetadata sharedLinkMetadata;
-//            if (marca != null) {
-//                sharedLinkMetadata = client.sharing().createSharedLinkWithSettings("/files/marcas/" + marca.getMarcaCoche() + ".png");
-//                System.out.println(sharedLinkMetadata.getUrl());
-//            } else {
-//                sharedLinkMetadata = client.sharing().createSharedLinkWithSettings("/files/marcas/" + "defaultImage" + ".png");
-//                System.out.println(sharedLinkMetadata.getUrl());
-//            }
-
-
-//                String localPath = "src/main/resources/static/images/marcas/Aston Martin.png";
-//            OutputStream outputStream = new FileOutputStream(localPath);
-//            FileMetadata metadata = client.files()
-//                    .downloadBuilder("/files/marcas/"+marca.getMarcaCoche() + ".png")
-//                    .download(outputStream);
-//            log.info("Descargando imagen");
-
         log.info("Recuperando urls de las marcas");
         HashMap<Integer, String> url = new HashMap<>();
 
@@ -320,68 +300,13 @@ public class FicherosService implements IFicherosService {
             jsonObject.forEach((idMarcaFE, object) -> {
                 url.put(Integer.valueOf(idMarcaFE.toString()), ((JSONObject) object).get("url").toString());
             });
-//                System.out.println(blog);
-
-//
-//                // loop array
-//                JSONArray tags = (JSONArray) jsonObject.get("Tags");
-//                Iterator<String> iterator = tags.iterator();
-//                while (iterator.hasNext()) {
-//                    System.out.println(iterator.next());
-//                }
-//                marcaDAO.findAll().forEach(marca -> {
-//                    try {
-//                        url.put(marca.getIdMarca(),
-//                                client.sharing().listSharedLinksBuilder()
-//                                        .withPath("/files/marcas/" + marca.getMarcaCoche() + ".png")
-//                                        .withDirectOnly(true)
-//                                        .start()
-//                                        .getLinks()
-//                                        .get(0)
-//                                        .getUrl()
-//                                        .replace("https://www.dropbox.com/","https://dl.dropboxusercontent.com/"));
-//                    } catch (DbxException e) {
-//                        e.printStackTrace();
-//                    }
-//                });
         } else {
             if (jsonObject.getOrDefault(String.valueOf(idMarca), null) != null) {
                 int idMarcaAux = Integer.parseInt((String) ((JSONObject) jsonObject.get(String.valueOf(idMarca))).get("idMarca"));
                 String urlString = (String) ((JSONObject) jsonObject.get(String.valueOf(idMarca))).get("url");
                 url.put(idMarcaAux, urlString);
             }
-            /*if (marca != null) {
-                sharedLinksResults = client.sharing().listSharedLinksBuilder().withPath("/files/marcas/" + marca.getMarcaCoche() + ".png").withDirectOnly(true).start();
-            } else {
-                sharedLinksResults = client.sharing().listSharedLinksBuilder().withPath("/files/marcas/defaultImageMarca.png").withDirectOnly(true).start();
-            }
-
-           if (sharedLinksResults.getLinks().isEmpty()) {
-//                    val shareLink = DropboxClientFactory.getClient().sharing().createSharedLinkWithSettings(db_pathLower) //.getClient().sharing().getSharedLinkMetadata(db_pathLower)
-//                    url = shareLink.url
-                url.put(idMarca, "Imagen no disponible");
-            } else {
-                // Se modifica la url para obtener solo la imagen y no el html que la contiene
-                String urlString = sharedLinksResults.getLinks().get(0).getUrl().replace("https://www.dropbox.com/", "https://dl.dropboxusercontent.com/");
-                url.put(idMarca, urlString);
-
-            }*/
-//                dropbox_url = getShareURL(url)!!.replaceFirst("https://www".toRegex(), "https://dl")
-
-
         }
-
-        //        Resource resource = null;
-//        if (marca != null) {
-//            Path filePath = Paths.get("src/main/resources/static/images/marcas").resolve("Aston Martin" + ".png").toAbsolutePath();
-////            Path filePath = Paths.get("src/main/resources/static/images/marcas").resolve(marca.getMarcaCoche() + ".png").toAbsolutePath();
-//            try {
-//                resource = new UrlResource(filePath.toUri());
-//            } catch (MalformedURLException e) {
-//                log.error("Error al buscar la marca " + idMarca + ": " + e);
-//                e.printStackTrace();
-//            }
-//        }
         return url;
     }
 
@@ -473,70 +398,24 @@ public class FicherosService implements IFicherosService {
 
             // Zona Remota
             MultipartFile multipartFile = new MockMultipartFile(filename, new FileInputStream(path));
-            uploadFile("links", multipartFile, filename);
+            uploadFile("links", multipartFile, filename, null);
         } catch (IOException e) {
             log.error("No se ha podido actualizar el fichero de enlaces compartidos " + filename + ": " + e.getMessage());
         }
     }
 
-
+//
 //    @Override
-//    public Resource load(String nameImage) throws MalformedURLException {
-//        Resource resource;
-//        HttpHeaders headers = new HttpHeaders();
-//        Path filePath = this.getPath(nameImage);
-//        resource = new UrlResource(filePath.toUri());
-//        if (!resource.exists() && !resource.isReadable()) {
-//            filePath = Paths.get("src/main/resources/static/images").resolve("defaultImage.jpg").toAbsolutePath();
-//            resource = new UrlResource(filePath.toUri());
-//        }
-//        log.info(filePath.toString());
-//        return resource;
-//    }
-
-    @Override
-    public Resource loadPropietario() throws MalformedURLException {
-        tipo = "usuarios";
-//        return load(PROPIETARIO_NAME);
-        return null;
-    }
-
-    @Override
-    public Resource loadModelo(String nameImage) throws MalformedURLException {
-        tipo = "modelos";
-//        return load(nameImage);
-        return null;
-    }
-
-//    @Override
-//    public String copy(MultipartFile file) throws IOException {
-//        String fileName = UUID.randomUUID() + "_" + file.getOriginalFilename().replace(" ", "");
-//        Path filePath = getPath(fileName);
-//        log.info(filePath.toString());
-//        Files.copy(file.getInputStream(), filePath);
-//        return fileName;
-//    }
-
-//    @Override
-//    public boolean delete(String nameImage) {
-//        if (nameImage != null && nameImage.length() > 0) {
-//            Path lastfilePath = getPath(nameImage);
-//            File lastFile = lastfilePath.toFile();
-//            if (lastFile.exists() && lastFile.canRead()) {
-//                lastFile.delete();
-//            }
-//        }
-//        return false;
+//    public Resource loadPropietario() throws MalformedURLException {
+//        tipo = "usuarios";
+////        return load(PROPIETARIO_NAME);
+//        return null;
 //    }
 //
 //    @Override
-//    public Path getPath(String nameImage) {
-//        if (tipo.equals("usuarios")) {
-//            return Paths.get(UPLOAD_DIR + "usuarios").resolve(nameImage).toAbsolutePath();
-//        } else if (tipo.equals("modelos")) {
-//            return Paths.get(UPLOAD_DIR + "modelos").resolve(nameImage).toAbsolutePath();
-//        } else {
-//            return null;
-//        }
+//    public Resource loadModelo(String nameImage) throws MalformedURLException {
+//        tipo = "modelos";
+////        return load(nameImage);
+//        return null;
 //    }
 }

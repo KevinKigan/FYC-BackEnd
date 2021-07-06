@@ -6,7 +6,6 @@ import com.kevingomez.FYCBackEnd.models.DAO.dao.Interfaces.ICocheDAO;
 import com.kevingomez.FYCBackEnd.models.DAO.dao.Interfaces.IMarcaDAO;
 import com.kevingomez.FYCBackEnd.models.DAO.dao.Interfaces.IModeloDAO;
 import com.kevingomez.FYCBackEnd.models.entity.Coches.Carroceria;
-import com.kevingomez.FYCBackEnd.models.entity.Coches.Coche;
 import com.kevingomez.FYCBackEnd.models.entity.Coches.Marca;
 import com.kevingomez.FYCBackEnd.models.entity.Coches.Modelo;
 import org.slf4j.Logger;
@@ -19,7 +18,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashMap;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicReference;
 
 @Service
 public class ModelosService implements IModelosService {
@@ -146,6 +144,11 @@ public class ModelosService implements IModelosService {
     @Override
     public Modelo findByModeloAndMarca_MarcaCoche(String marca, String modelo_str) {
         return modeloDAO.findByModeloAndMarca_MarcaCoche(modelo_str, marca);
+    }
+
+    @Override
+    public Modelo save(Modelo modelo) {
+        return modeloDAO.save(modelo);
     }
 
 }
