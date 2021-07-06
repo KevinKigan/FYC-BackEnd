@@ -15,7 +15,14 @@ public interface IModelosService {
     List<Carroceria> findAllCarrocerias();
     Modelo findModeloById(int id);
     Page<Modelo> findAllModelos(Pageable pageable);
+    Marca saveMarca(Marca marca);
+    Marca findMarcaById(int id);
     Page<Modelo> findAllModelosPorMarca(Pageable pageable, int idMarca);
     List<Modelo> findAllModelosPorMarca(int idMarca);
     HashMap<String,String> findImagen(String modelo, String marca);
+    HashMap<Integer, String> findAllCarroceriasPorModelo(List<Integer> idsModelos);
+
+    Modelo findByModeloAndMarca_MarcaCoche(String marca, String modelo_str);
+
+    Modelo save(Modelo modelo);
 }

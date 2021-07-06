@@ -47,4 +47,21 @@ public class Combustible  implements Serializable {
     public void setTipoCombustibleAlternativo(TipoCombustible tipoCombustibleAlternativo) {
         this.tipoCombustibleAlternativo = tipoCombustibleAlternativo;
     }
+
+    @Override
+    public String toString() {
+        if(tipoCombustibleAlternativo==null) {
+            return "Combustible{" +
+                    "tipoCombustibleNormalId=" + tipoCombustibleNormal.getIdCombustible() +
+                    ",tipoCombustibleNormal=" + tipoCombustibleNormal.getTipoCombustible() +
+                    '}';
+        }else {
+            return "Combustible{" +
+                    "tipoCombustibleNormalId=" + tipoCombustibleNormal.getIdCombustible() +
+                    ",tipoCombustibleNormal=" + tipoCombustibleNormal.getTipoCombustible() +
+                    ",tipoCombustibleAltId=" + tipoCombustibleAlternativo.getIdCombustible() +
+                    ",tipoCombustibleAlt=" + tipoCombustibleAlternativo.getTipoCombustible() +
+                    '}';
+        }
+    }
 }

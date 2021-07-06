@@ -13,17 +13,17 @@ public class Volumen {
     @Column(name = "volumen_id")
     private int idVolumen;
 
-    @OneToOne(fetch = FetchType.LAZY) // Un coche tiene un volumen 2 puertas
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL) // Un coche tiene un volumen 2 puertas
     @JoinColumn(name = "volumen_2puertas_id")
     @JsonIgnoreProperties(value={"hibernateLazyInitializer","handler"}, allowSetters = true)
     private Volumen2Puertas volumen2p;
 
-    @OneToOne(fetch = FetchType.LAZY) // Un coche tiene un volumen 4 puertas
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL) // Un coche tiene un volumen 4 puertas
     @JoinColumn(name = "volumen_4puertas_id")
     @JsonIgnoreProperties(value={"hibernateLazyInitializer","handler"}, allowSetters = true)
     private Volumen4Puertas volumen4p;
 
-    @OneToOne(fetch = FetchType.LAZY) // Un coche tiene un volumen hatchback
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL) // Un coche tiene un volumen hatchback
     @JoinColumn(name = "volumen_hatchback_id")
     @JsonIgnoreProperties(value={"hibernateLazyInitializer","handler"}, allowSetters = true)
     private VolumenHatchback volumenHatchback;

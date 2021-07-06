@@ -17,6 +17,8 @@ public interface ICocheDAO extends JpaRepository<Coche, Integer> {
     List<Coche> findByModelo_IdModelo(int idModelo);
     List<Coche> findAllByIdCocheIn(List<Integer> ids);
 
+    Coche findTop1ByModelo_IdModelo(int idModelo);
+
     @Query(value = "select c from Coche c where c.modelo.idModelo in ?1 order by c.precio asc,c.modelo.idModelo desc")
     List<Coche> findPrecio(List<Integer> idsModelos);
 

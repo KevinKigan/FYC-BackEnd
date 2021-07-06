@@ -25,7 +25,7 @@ public class Emisiones implements Serializable {
     @ManyToOne(fetch = FetchType.LAZY) // Muchas emisiones pueden tener un tipo emision
     @JoinColumn(name = "tipo_emisiones_id")
     @JsonIgnoreProperties(value={"hibernateLazyInitializer","handler"}, allowSetters = true)
-    private TipoEmisiones tipoEmisones;
+    private TipoEmisiones tipoEmisiones;
 
     public int getIdEmisiones() {
         return idEmisiones;
@@ -51,11 +51,11 @@ public class Emisiones implements Serializable {
         this.CO2Alt = CO2Alt;
     }
 
-    public TipoEmisiones getTipoEmisones() {
-        return tipoEmisones;
+    public TipoEmisiones getTipoEmisiones() {
+        return tipoEmisiones;
     }
 
-    public void setTipoEmisones(TipoEmisiones tipoEmisones) {
-        this.tipoEmisones = tipoEmisones;
+    public void setTipoEmisones(TipoEmisiones tipoEmisiones) {
+        this.tipoEmisiones = tipoEmisiones;
     }
 }

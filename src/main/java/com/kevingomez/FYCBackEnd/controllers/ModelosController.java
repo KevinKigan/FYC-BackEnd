@@ -13,6 +13,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
@@ -39,9 +40,56 @@ public class ModelosController {
      */
     @GetMapping("marcas")
     public List<Marca> indexMarcas() {
-        log.info("Buscando todos las marcas");
+        log.info("Buscando todas las marcas");
         return modelosService.findAllMarcas();
     }
+
+    /**
+     * Metodo para guardar una marca
+     *
+     * @return Lista de Marcas
+     */
+    @Secured("ROLE_ADMIN")
+    @PostMapping("save_marca")
+    public ResponseEntity<?> saveMarca(@RequestBody Marca marca) {
+        Map<String, Object> response = new HashMap<>();
+        if(marca.getMarcaCoche()!=null && !marca.getMarcaCoche().trim().equals("")) {
+            log.info("Guardando marca actualizada");
+            modelosService.saveMarca(marca);
+            response.put("marca", marca);
+            response.put("message", "Marca guardada correctamente.");
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        }else{
+            log.error("La marca no se ha podido guardar. Datos invalidos");
+            response.put("error", "La marca no se ha podido guardar. Datos invalidos.");
+            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    /**
+     * Metodo para guardar una marca
+     *
+     * @return Lista de Marcas
+     */
+    @PostMapping("carrocerias_por_modelo")
+    public ResponseEntity<?> carroceriasPorModelo(@RequestBody List<Integer> idsModelos) {
+        Map<String, Object> response = new HashMap<>();
+        HashMap<Integer, String> map = this.modelosService.findAllCarroceriasPorModelo(idsModelos);
+//        if(marca.getMarcaCoche()!=null && !marca.getMarcaCoche().trim().equals("")) {
+//            log.info("Guardando marca actualizada");
+//            modelosService.saveMarca(marca);
+//            response.put("marca", marca);
+//            response.put("message", "Marca guardada correctamente.");
+//            return new ResponseEntity<>(response, HttpStatus.OK);
+//        }else{
+//            log.error("La marca no se ha podido guardar. Datos invalidos");
+//            response.put("error", "La marca no se ha podido guardar. Datos invalidos.");
+        response.put("carrocerias",map);
+            return new ResponseEntity<>(response, HttpStatus.OK);
+//        }
+    }
+
+
 
     /**
      * Metodo para buscar todas las carrocerias
@@ -93,6 +141,18 @@ public class ModelosController {
     public Page<Modelo> findModelosPage(@PathVariable Integer pageSize, @PathVariable Integer page) {
         log.info("Buscando la pagina "+page+" de modelos con "+pageSize+" elementos");
         return modelosService.findAllModelos(PageRequest.of(page, pageSize));
+    }
+
+    /**
+     * Metodo para retornar una pagina con un numero de modelos
+     *
+     * @return Pagina de modelos
+     */
+    @GetMapping("")
+    public Modelo findModelosPage(@RequestParam(value = "marca_str") String marca, @RequestParam(value = "modelo_str") String modelo_str) {
+        log.info("Buscando modelo con nombre "+modelo_str+" de marca con marca"+marca);
+        Modelo m = modelosService.findByModeloAndMarca_MarcaCoche(marca, modelo_str);
+        return m;
     }
 
     /**

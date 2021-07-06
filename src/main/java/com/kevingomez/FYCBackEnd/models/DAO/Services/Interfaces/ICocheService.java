@@ -1,8 +1,6 @@
 package com.kevingomez.FYCBackEnd.models.DAO.Services.Interfaces;
 
 import com.kevingomez.FYCBackEnd.models.entity.Coches.*;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -21,4 +19,27 @@ public interface ICocheService {
     List<MotorCombustion> getAllMotorCombustionByIds(List<Integer> idsMotorCombustion);
     List<Coche>findAllCocheByIdModelo(int idModelo);
     ArrayList generateDataVolumenCarroceria(int idCarroceria);
+
+    List<TipoMotor> findAllTipoMotorByIds(List<Integer> idsTiposMotor);
+    TipoMotor findTipoMotorById(int id);
+
+    Consumo findConsumoById(Integer id);
+
+    Emisiones getEmisionesById(int id);
+
+    List<TipoCombustible> findAllTipoCombustible();
+
+    List<TipoEmisiones> findAllNormativasConsumos();
+
+    Coche save(Coche coche);
+
+    MotorCombustion saveMotorCombustion(MotorCombustion motorCombustion);
+
+    Consumo saveConsumo(Consumo consumo);
+
+    Volumen findVolumenById(int id);
+
+    MotorElectrico saveMotorElectrico(MotorElectrico motorElectrico);
+
+    Volumen saveVolumen(Volumen volumen);
 }

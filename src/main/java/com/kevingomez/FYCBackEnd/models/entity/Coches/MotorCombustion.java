@@ -30,7 +30,7 @@ public class MotorCombustion implements Serializable {
     @NotNull(message = "El combustible no puede estar vacio")
     private Combustible combustible;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "emisiones_id")
     @JsonIgnoreProperties(value={"idTipoEmisiones","hibernateLazyInitializer","handler"}, allowSetters = true)
     private Emisiones emisiones;

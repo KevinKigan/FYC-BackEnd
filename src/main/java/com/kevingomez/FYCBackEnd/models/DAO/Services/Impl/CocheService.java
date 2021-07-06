@@ -1,13 +1,12 @@
 package com.kevingomez.FYCBackEnd.models.DAO.Services.Impl;
 
+
 import com.kevingomez.FYCBackEnd.models.DAO.Services.Interfaces.ICocheService;
 import com.kevingomez.FYCBackEnd.models.DAO.dao.Interfaces.*;
 import com.kevingomez.FYCBackEnd.models.entity.Coches.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
@@ -26,17 +25,27 @@ public class CocheService implements ICocheService {
     @Autowired
     private ICocheDAO cocheDAO;
     @Autowired
-    private IModeloDAO modeloDAO;
+    private ISobrealimentacionDAO sobrealimentacionDAO;
     @Autowired
     private IVolumenDAO volumenDAO;
     @Autowired
     private IConsumoDAO consumoDAO;
     @Autowired
+    private IConsumoNormalDAO consumoNormalDAO;
+    @Autowired
+    private IConsumoAlternativoDAO consumoAlternativoDAO;
+    @Autowired
+    private IConsumoElectricoDAO consumoElectricoDAO;
+    @Autowired
+    private ICombustibleDAO combustibleDAO;
+    @Autowired
+    private ITipoCombustibleDAO tipoCombustibleDAO;
+    @Autowired
+    private ITipoEmisionesDAO tipoEmisionesDAO;
+    @Autowired
     private ITipoMotorDAO tipoMotorDAO;
     @Autowired
     private IEmisionesDAO emisionesDAO;
-    @Autowired
-    private IConsumoNormalDAO consumoNormalDAO;
     @Autowired
     private IMotorCombustionDAO motorCombustionDAO;
     @Autowired
@@ -63,18 +72,19 @@ public class CocheService implements ICocheService {
 
 
     @Override
+    @Transactional(readOnly = true)
     public List<Consumo> findAllConsumosById(List<Integer> idsConsumo) {
         List<Consumo> consumos = this.consumoDAO.findAllByIdConsumoIn(idsConsumo);
         return this.consumoDAO.findAllByIdConsumoIn(idsConsumo);
     }
 
     @Override
+    @Transactional(readOnly = true)
     public HashMap<String, String> findChartId(int idCoche) {
         HashMap<String, String> chart = new HashMap<>();
         Coche coche = this.cocheDAO.findById(idCoche).orElse(null);
         if (coche != null) {
             ConsumoNormal cm = getConsumoNormal(coche);
-            System.out.println(coche.getTipoMotor().getMotorCombustion().getIdMotorCombustion());
             Volumen vol = null;
             if (coche.getModelo().getVolumen() != null) {
                 vol = this.volumenDAO.findById(coche.getModelo().getVolumen().getIdVolumen()).orElse(null);
@@ -128,6 +138,7 @@ public class CocheService implements ICocheService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public HashMap<String, String> findChartSemejantesId(int idCoche) {
         //Todo semejantes por precio
         HashMap<String, String> chart = new HashMap<>();
@@ -137,7 +148,6 @@ public class CocheService implements ICocheService {
             // Busca todos los coches que esten en el margen de precio
             List<Coche> coches = this.cocheDAO.findAllByPrecioIsGreaterThanEqualAndPrecioIsLessThanEqualAndAndCarroceria_Carroceria(
                     (int) (precio * (1 - MARGEN)), (int) (precio * (1 + MARGEN)), cocheSeleccionado.getCarroceria().getCarroceria());
-            System.out.println("Carroceria = "+cocheSeleccionado.getCarroceria().getCarroceria());
             List<Coche> aux = new ArrayList<>(); // Variable para eliminar los coches del array que coinciden con el modelo actual
             AtomicReference<Double> mediaPrecio = new AtomicReference<>((double) 0);
             AtomicReference<Double> mediaConsumoMix = new AtomicReference<>((double) 0);
@@ -288,6 +298,7 @@ public class CocheService implements ICocheService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<MotorCombustion> getAllMotorCombustionByIds(List<Integer> idsMotorCombustion) {
         return this.motorCombustionDAO.findByIdMotorCombustionIn(idsMotorCombustion);
     }
@@ -299,6 +310,7 @@ public class CocheService implements ICocheService {
      * @return
      */
     @Override
+    @Transactional(readOnly = true)
     public List<Coche> findAllCocheByIdModelo(int idModelo) {
         return cocheDAO.findByModelo_IdModelo(idModelo);
     }
@@ -453,7 +465,85 @@ public class CocheService implements ICocheService {
 //        return coches.get(0);
     }
 
+    @Override
+    @Transactional(readOnly = true)
+    public List<TipoMotor> findAllTipoMotorByIds(List<Integer> idsTiposMotor) {
+        return this.tipoMotorDAO.findAllById(idsTiposMotor);
+    }
 
+    @Override
+    @Transactional(readOnly = true)
+    public TipoMotor findTipoMotorById(int id) {
+        return this.tipoMotorDAO.findById(id).orElse(null);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Consumo findConsumoById(Integer id) {
+        return this.consumoDAO.findById(id).orElse(null);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Emisiones getEmisionesById(int id) {
+        return this.emisionesDAO.findById(id).orElse(null);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Volumen findVolumenById(int id) {
+        return this.volumenDAO.findById(id).orElse(null);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<TipoCombustible> findAllTipoCombustible() {
+        return this.tipoCombustibleDAO.findAll();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<TipoEmisiones> findAllNormativasConsumos() {
+        return this.tipoEmisionesDAO.findAll();
+    }
+
+    @Override
+    public Coche save(Coche coche) {
+        return this.cocheDAO.save(coche);
+    }
+
+    @Override
+    public MotorCombustion saveMotorCombustion(MotorCombustion motorCombustion) {
+        Sobrealimentacion sobrealimentacion = motorCombustion.getSobrealimentacion();
+        Combustible combustible = motorCombustion.getCombustible();
+        if(combustible.getTipoCombustibleAlternativo().getIdCombustible() == 0){
+            combustible.getTipoCombustibleAlternativo().setIdCombustible(combustible.getTipoCombustibleNormal().getIdCombustible());
+        }
+        this.combustibleDAO.save(combustible);
+        this.sobrealimentacionDAO.save(sobrealimentacion);
+        return this.motorCombustionDAO.save(motorCombustion);
+    }
+
+    @Override
+    public Volumen saveVolumen(Volumen volumen) {
+        return this.volumenDAO.save(volumen);
+    }
+
+    @Override
+    public MotorElectrico saveMotorElectrico(MotorElectrico motorElectrico) {
+        return this.motorElectricoDAO.save(motorElectrico);
+    }
+
+    @Override
+    public Consumo saveConsumo(Consumo consumo) {
+        ConsumoNormal cn = consumo.getIdConsumoNormal();
+        ConsumoAlternativo ca = consumo.getIdConsumoAlternativo();
+        ConsumoElectrico ce= consumo.getIdConsumoElectrico();
+        if(cn!=null) this.consumoNormalDAO.save(cn);
+        if(ca!=null) this.consumoAlternativoDAO.save(ca);
+        if(ce!=null) this.consumoElectricoDAO.save(ce);
+        return this.consumoDAO.save(consumo);
+    }
 
     private ConsumoNormal getConsumoNormal(Coche coche) {
         int idConsumo = coche.getConsumo().getIdConsumo();

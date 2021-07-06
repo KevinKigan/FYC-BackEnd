@@ -1,6 +1,7 @@
 package com.kevingomez.FYCBackEnd.auth;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -10,11 +11,9 @@ import org.springframework.security.oauth2.config.annotation.web.configuration.A
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableAuthorizationServer;
 import org.springframework.security.oauth2.config.annotation.web.configurers.AuthorizationServerEndpointsConfigurer;
 import org.springframework.security.oauth2.config.annotation.web.configurers.AuthorizationServerSecurityConfigurer;
-import org.springframework.security.oauth2.provider.token.TokenEnhancer;
 import org.springframework.security.oauth2.provider.token.TokenEnhancerChain;
 import org.springframework.security.oauth2.provider.token.store.JwtAccessTokenConverter;
 
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.nio.file.Paths;
@@ -27,13 +26,21 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
     @Autowired
     private BCryptPasswordEncoder passwordEncoder;
 
+    @Value("${security.auth.clientId}")
+    private String CLIENT_ID;
+    @Value("${security.auth.clientPass}")
+    private String CLIENT_PASS;
+    @Value("${jwt.privateKey}")
+    private String PRIVATE_KEY;
+    @Value("${jwt.publicKey}")
+    private String PUBLIC_KEY;
+
+
     @Autowired
     private AuthenticationManager authenticationManager;
 
     @Autowired
     private AdditionalInfoToken additionalInfoToken;
-
-    private final Properties propiedades = new Properties();
 
     /**
      * Metodo para restringir las llamadas dependiendo de los permisos que tenga el usuario
@@ -55,18 +62,13 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
      */
     @Override
     public void configure(ClientDetailsServiceConfigurer clients) throws Exception {
-        propiedades.load(new FileReader(String.valueOf(Paths.get("src/main/resources/")
-                .resolve("security.properties").toAbsolutePath())));
-        String clientId = propiedades.getProperty("security.auth.clientId");
-        String clientPass = propiedades.getProperty("security.auth.clientPass");
-        clients.inMemory().withClient(clientId)                     // Nombre del FrontEnd
-                .secret(passwordEncoder.encode(clientPass))         // Password del FrontEnd
+        clients.inMemory().withClient(CLIENT_ID)                     // Nombre del FrontEnd
+                .secret(passwordEncoder.encode(CLIENT_PASS))         // Password del FrontEnd
                 .scopes("read","write")                             // Tipo de accesos permitidos
                 .authorizedGrantTypes("password", "refresh_token")  // Como se va a autorizar
                 .accessTokenValiditySeconds(14400)                  // Tiempo de validez del token
                 .refreshTokenValiditySeconds(14400);                // Tiempo en el que se tiene que
                                                                     // refrescar el token
-
     }
 
     /**
@@ -92,15 +94,10 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
      * @return
      */
     @Bean
-    public JwtAccessTokenConverter accessTokenConverter() throws IOException {
+    public JwtAccessTokenConverter accessTokenConverter() {
         JwtAccessTokenConverter jwtAccessTokenConverter = new JwtAccessTokenConverter();
-        propiedades.load(new FileReader(String.valueOf(Paths.get("src/main/resources/")
-                .resolve("security.properties").toAbsolutePath())));
-        String privateKey = propiedades.getProperty("jwt.privateKey");
-        String publicKey  = propiedades.getProperty("jwt.publicKey");
-
-        jwtAccessTokenConverter.setSigningKey(privateKey);
-        jwtAccessTokenConverter.setVerifierKey(publicKey);
+        jwtAccessTokenConverter.setSigningKey(PRIVATE_KEY);
+        jwtAccessTokenConverter.setVerifierKey(PUBLIC_KEY);
         return jwtAccessTokenConverter;
     }
 }

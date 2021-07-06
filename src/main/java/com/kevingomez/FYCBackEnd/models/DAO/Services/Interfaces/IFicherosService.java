@@ -1,10 +1,12 @@
 package com.kevingomez.FYCBackEnd.models.DAO.Services.Interfaces;
 
-import org.springframework.core.io.Resource;
+import com.dropbox.core.DbxException;
+import com.kevingomez.FYCBackEnd.models.entity.Coches.Marca;
+import com.kevingomez.FYCBackEnd.models.entity.Coches.Modelo;
+import com.kevingomez.FYCBackEnd.models.entity.Usuarios.Usuario;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.List;
@@ -12,10 +14,11 @@ import java.util.List;
 public interface IFicherosService {
     HashMap<Integer, String> getURLMarcaLogo(int idMarca, boolean varias);
     HashMap<Integer, String> getURLModelosLogo(List<Integer> idsModelos);
-    Path getPath(String nameImage);
-    boolean delete(String nameImage);
-    String copy(MultipartFile file) throws IOException;
-    Resource loadModelo(String nameImage) throws MalformedURLException;
-    Resource loadPropietario() throws MalformedURLException;
-    Resource load(String nameImage) throws MalformedURLException;
+    HashMap<Integer, String> getURLUsuario(List<Integer> idsUsuarios);
+    void setURLUsuario(Usuario idUsuario);
+    String uploadFile(String area, MultipartFile file, String filename, Modelo modelo);
+    Path downloadFile(String area, String filename) throws DbxException, IOException;
+
+    void setURLMarca(Marca marca);
+    void setURLModelo(Modelo modelo, String filename);
 }
