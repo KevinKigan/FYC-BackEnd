@@ -1,5 +1,6 @@
 package com.kevingomez.FYCBackEnd.controllers;
 
+import com.kevingomez.FYCBackEnd.models.DAO.Services.Interfaces.IChartService;
 import com.kevingomez.FYCBackEnd.models.DAO.Services.Interfaces.ICocheService;
 import com.kevingomez.FYCBackEnd.models.entity.Coches.*;
 import org.slf4j.Logger;
@@ -20,10 +21,13 @@ public class CochesController {
     @Autowired
     private ICocheService cocheService;
 
+    @Autowired
+    private IChartService chartService;
+
 
     /**
      * Metodo para retornar todos los coches
-     *
+     * @param idModelo Id del modelo
      * @return Lista de Coches
      */
     @GetMapping("modelo/{idModelo}")
@@ -65,8 +69,8 @@ public class CochesController {
 
     /**
      * Metodo para retornar los precios de los modelos solicitados
-     * @param idsModelos
-     * @return
+     * @param idsModelos Lista de modelos
+     * @return HashMap con los precios
      */
     @PostMapping("precios")
     public HashMap<String, String> preciosModelos(@RequestBody List<Integer> idsModelos) {
@@ -75,6 +79,11 @@ public class CochesController {
     }
 
 
+    /**
+     * Metodo para buscar los tipos de motores por lista
+     * @param idsTiposMotor Lista con los ids de los motores
+     * @return Lista de motores
+     */
     @PostMapping("tipos_motores")
     public ResponseEntity<?> findTiposMotor(@RequestBody List<Integer> idsTiposMotor) {
         Map<String, Object> response = new HashMap<>();
@@ -86,6 +95,10 @@ public class CochesController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
+    /**
+     * Metodo para buscar los tipos de combustibles
+     * @return Lista de tipos de combustibles
+     */
     @GetMapping("tipos_combustibles")
     public ResponseEntity<?> findTiposCombustibles() {
         Map<String, Object> response = new HashMap<>();
@@ -95,6 +108,10 @@ public class CochesController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
+    /**
+     * Metodo para buscar las normativas europeas
+     * @return Lista con las normativas europeas
+     */
     @GetMapping("normativas_consumos")
     public ResponseEntity<?> findNormativasConsumos() {
         Map<String, Object> response = new HashMap<>();
@@ -124,8 +141,8 @@ public class CochesController {
 
     /**
      * Metodo para guardar el consumo
-     * @param consumo
-     * @return
+     * @param consumo Consumo a guardar
+     * @return Consumo guardado
      */
     @Secured("ROLE_ADMIN")
     @PostMapping("consumo/save")
@@ -145,13 +162,18 @@ public class CochesController {
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
+    /**
+     * Metodo para buscar el consumo por id
+     * @param id Id del consumo a buscasr
+     * @return Consumo encontrado
+     */
     @GetMapping("consumo/{id}")
     public Consumo findConsumoById(@PathVariable Integer id){
         log.info("Buscando el consumos con id "+ id);
         return this.cocheService.findConsumoById(id);
     }
 
-    /**
+    /*
      * *****************************************************************************************************************
      *                                                 Motor Combustion
      * *****************************************************************************************************************
@@ -232,7 +254,7 @@ public class CochesController {
         return cocheService.getEmisionesById(id);
     }
 
-    /**
+    /*
      * *****************************************************************************************************************
      *                                                 Motor Electrico
      * *****************************************************************************************************************
@@ -288,7 +310,7 @@ public class CochesController {
 
 
 
-    /**
+    /*
      * *****************************************************************************************************************
      *                                                 Volumen
      * *****************************************************************************************************************
@@ -330,35 +352,40 @@ public class CochesController {
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
-    /**
+    /*
      * *****************************************************************************************************************
      *                                                 Gestion
      * *****************************************************************************************************************
      */
-    /**
-     * Metodo para
-     *
-     * @param idCarroceria Id de la carroceria a gestionar
-     * @return
-     */
-
-    @GetMapping("generardatos/volumen/carroceria/{idCarroceria}")
-    public Coche generateDataVolumenCarroceria(@PathVariable int idCarroceria){
-        log.info("Generando datos de volumen para idCarroceria: "+idCarroceria);
-//        return cocheService.generateDataVolumenCarroceria(idCarroceria);
-        return null;
-    }
+//    /**
+//     * Metodo para
+//     *
+//     * @param idCarroceria Id de la carroceria a gestionar
+//     * @return Coche encontrados
+//     */
+//
+//    @GetMapping("generardatos/volumen/carroceria/{idCarroceria}")
+//    public Coche generateDataVolumenCarroceria(@PathVariable int idCarroceria){
+//        log.info("Generando datos de volumen para idCarroceria: "+idCarroceria);
+////        return cocheService.generateDataVolumenCarroceria(idCarroceria);
+//        return null;
+//    }
 
     @GetMapping("chart/{idCoche}")
     public HashMap<String, String> getChartByIdCoche(@PathVariable int idCoche){
         log.info("Buscamos valores de coche id "+idCoche);
         return this.cocheService.findChartId(idCoche);
     }
+    @GetMapping("chartVolumen")
+    public HashMap<String, Object> getChartVolumen(){
+        log.info("Buscamos datos de grafica de volumenes");
+        return this.chartService.getChartVolumen();
+    }
 
-    @GetMapping("chartsemejantes/{idCoche}")
-    public HashMap<String, String> getChartSemejantesByIdCoche(@PathVariable int idCoche){
-        log.info("Buscamos valores medios de coches semejantes a coche id "+idCoche);
-        return this.cocheService.findChartSemejantesId(idCoche);
+    @GetMapping("chartsemejantes/{idCoche}/{filtro}")
+    public HashMap<String, String> getChartSemejantesByIdCoche(@PathVariable int idCoche, @PathVariable String filtro){
+        log.info("Buscamos valores medios de coches semejantes a coche id "+idCoche+ " por "+filtro);
+        return this.cocheService.findChartSemejantesId(idCoche, filtro);
     }
 
 

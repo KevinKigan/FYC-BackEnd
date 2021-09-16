@@ -49,7 +49,8 @@ public class UsuariosController {
 
     /**
      * Metodo para retornar todos los usuarios
-     *
+     * @param page Pagina
+     * @param pageSize Tamaño de la pagina
      * @return Pagina con los usuarios
      */
     @Secured("ROLE_ADMIN")
@@ -88,7 +89,7 @@ public class UsuariosController {
 
     /**
      * metodo para obtener un usuario mediante id
-     *
+     * @param token token
      * @param username Nomrbe de usuario
      * @return Usuario encontrado
      */
@@ -173,6 +174,7 @@ public class UsuariosController {
     /**
      * Metodo para crear un usuario
      *
+     * @param result Result
      * @param usuario Usuario a crear
      * @return Usuario creado
      */
@@ -217,6 +219,7 @@ public class UsuariosController {
     /**
      * Metodo para actualizar un usuario
      *
+     * @param result Result
      * @param usuario Usuario a modificar
      * @param id      Identificador del usuario
      * @return Usuario modificado
@@ -274,9 +277,9 @@ public class UsuariosController {
     /**
      * Metodo para actualizar los roles del usuario
      *
-     * @param roles
-     * @param id
-     * @return
+     * @param roles Lista de roles
+     * @param id Id del usuario
+     * @return Usuario
      */
     @Secured("ROLE_ADMIN")
     @PostMapping("/set_roles/{id}")
@@ -295,8 +298,9 @@ public class UsuariosController {
     /**
      * Metodo para enviar por correo un codigo de verificacion
      *
+     * @param tipo Tipo
      * @param identificador Identificador del usuario
-     * @return
+     * @return Usuario
      */
     @ResponseStatus(HttpStatus.CREATED)
     @GetMapping("/send_verification_code/{identificador}/{tipo}")
@@ -326,7 +330,8 @@ public class UsuariosController {
      * Metodo para comporbar el codigo de verificacion enviado por correo
      *
      * @param id Id del usuario
-     * @return
+     * @param code Codigo de verificacion
+     * @return Respuesta de la verificacion
      */
     @ResponseStatus(HttpStatus.CREATED)
     @GetMapping("/check_verification_code/{id}/{code}")
@@ -347,7 +352,7 @@ public class UsuariosController {
      * enviar por correo un codigo de verificacion
      *
      * @param id Id del usuario
-     * @return
+     * @return HttpRequest de respuesta del envio
      */
     @ResponseStatus(HttpStatus.CREATED)
     @GetMapping("/send_verification_code/new_pass/{id}")

@@ -181,8 +181,8 @@ public class FicherosService implements IFicherosService {
      * @param area     Tipo de area al que pertenece el fichero
      * @param filename Nombre del fichero
      * @return Path del fichero descargado
-     * @throws DbxException
-     * @throws IOException
+     * @throws DbxException DbxException
+     * @throws IOException IOException
      */
     public Path downloadFile(String area, String filename) throws DbxException, IOException {
 
@@ -201,6 +201,11 @@ public class FicherosService implements IFicherosService {
 
     }
 
+    /**
+     * Metodo para actualizar la url del archivo de
+     * enlaces compartidos relacionado con las marcas
+     * @param marca Marca a actualizar
+     */
     @Override
     public void setURLMarca(Marca marca) {
         int id = marca.getIdMarca();
@@ -356,7 +361,7 @@ public class FicherosService implements IFicherosService {
     /**
      * Metodo para actualizar la URL del usuario en el archivo de urls local y remoto
      *
-     * @param user
+     * @param user Usuario
      */
     @Override
     public void setURLUsuario(Usuario user) {
@@ -388,6 +393,12 @@ public class FicherosService implements IFicherosService {
         }
     }
 
+    /**
+     * Metodo para actualizar el fichero de enlaces
+     * compartidos, guardarlo localmente y subirlo a dropbox
+     * @param jsonObject jsonObject Con el contenido del fichero
+     * @param filename Nombre del fichero
+     */
     private void saveFileLocaleAndRemote(JSONObject jsonObject, String filename) {
         try {
             // Zona local
@@ -403,19 +414,4 @@ public class FicherosService implements IFicherosService {
             log.error("No se ha podido actualizar el fichero de enlaces compartidos " + filename + ": " + e.getMessage());
         }
     }
-
-//
-//    @Override
-//    public Resource loadPropietario() throws MalformedURLException {
-//        tipo = "usuarios";
-////        return load(PROPIETARIO_NAME);
-//        return null;
-//    }
-//
-//    @Override
-//    public Resource loadModelo(String nameImage) throws MalformedURLException {
-//        tipo = "modelos";
-////        return load(nameImage);
-//        return null;
-//    }
 }

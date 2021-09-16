@@ -45,11 +45,10 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
     /**
      * Metodo para restringir las llamadas dependiendo de los permisos que tenga el usuario
      *
-     * @param security
-     * @throws Exception
+     * @param security AuthorizationServerSecurityConfigurer
      */
     @Override
-    public void configure(AuthorizationServerSecurityConfigurer security) throws Exception {
+    public void configure(AuthorizationServerSecurityConfigurer security) {
         security.tokenKeyAccess("permitAll()")
                 .checkTokenAccess("isAuthenticated()"); // Verifica el token y la firma: /oauth/check_token
     }
@@ -57,8 +56,8 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
     /**
      * Metodo para registrar el cliente (FrontEnd)
      *
-     * @param clients
-     * @throws Exception
+     * @param clients Clientes del servidor
+     * @throws Exception Excepcion
      */
     @Override
     public void configure(ClientDetailsServiceConfigurer clients) throws Exception {
@@ -77,8 +76,8 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
      * Registra el authentication manager y el accesTokenConverter
      * que almacena los datos de autentificacion del usuario
      *
-     * @param endpoints
-     * @throws Exception
+     * @param endpoints Endpoints
+     * @throws Exception Exception
      */
     @Override
     public void configure(AuthorizationServerEndpointsConfigurer endpoints) throws Exception {
@@ -91,7 +90,7 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
     /**
      * Metodo para crear el accessTokenConverter
      * espeficicamente de tipo JWT
-     * @return
+     * @return JwtAccessTokenConverter
      */
     @Bean
     public JwtAccessTokenConverter accessTokenConverter() {

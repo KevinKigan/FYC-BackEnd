@@ -15,7 +15,7 @@ public interface ICocheService {
     HashMap<String, String> findAllPreciosList(List<Integer> ids);
     List<Consumo> findAllConsumosById(List<Integer>idsCoches);
     HashMap<String, String> findChartId(int idCoche);
-    HashMap<String, String> findChartSemejantesId(int idCoche);
+    HashMap<String, String> findChartSemejantesId(int idCoche, String filtro);
     List<MotorCombustion> getAllMotorCombustionByIds(List<Integer> idsMotorCombustion);
     List<Coche>findAllCocheByIdModelo(int idModelo);
     ArrayList generateDataVolumenCarroceria(int idCarroceria);
