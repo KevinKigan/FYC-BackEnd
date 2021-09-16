@@ -25,8 +25,8 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
      * Metodo para registrar en el authentication manager
      * de spring security el servicio para autenticar
      *
-     * @param auth
-     * @throws Exception
+     * @param auth AuthenticationManagerBuilder
+     * @throws Exception Exception
      */
     @Override
     @Autowired
@@ -37,7 +37,7 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
     /**
      * Metodo para declarar el tipo de encriptado de la contraseña
      *
-     * @return
+     * @return BCryptPasswordEncoder
      */
     @Bean
     //Mediante la anotacion bean, se registra el objeto que retorna el metodo passwordEncoder
@@ -50,8 +50,8 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
      * Metodo para retornar el authentication maneger que se necesita en la
      * configuracion del OAuth2 que implementa el proceso de login
      *
-     * @return
-     * @throws Exception
+     * @return AuthenticationManager
+     * @throws Exception Exception
      */
     @Bean
     @Override
@@ -64,8 +64,8 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
      * que protege nuestro formulario a traves de un token
      * ya que la seguridad en el login la hacemos en el lado de Angular
      *
-     * @param http
-     * @throws Exception
+     * @param http HttpSecurity
+     * @throws Exception Exception
      */
     @Override
     public void configure(HttpSecurity http) throws Exception {

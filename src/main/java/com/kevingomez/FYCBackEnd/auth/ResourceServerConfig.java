@@ -47,7 +47,7 @@ public class ResourceServerConfig extends ResourceServerConfigurerAdapter {
      * Metodo para manejar las peticiones de origen
      * cruzado (CORS) sobre el cliente
      *
-     * @return
+     * @return CorsConfigurationSource
      */
     @Bean
     public CorsConfigurationSource corsConfigurationSource(){
@@ -69,7 +69,7 @@ public class ResourceServerConfig extends ResourceServerConfigurerAdapter {
      * los endpoint para la autentificacion y generar el token y la
      * validacion de nuestro token
      *
-     * @return
+     * @return FilterRegistrationBean
      */
     @Bean
     public FilterRegistrationBean<CorsFilter> corsFilter() {

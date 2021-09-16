@@ -129,9 +129,9 @@ public class UsuariosService implements IUsuariosService, UserDetailsService {
      * Metodo para verificar al nuevo usuario con el cogido de verificacion
      * que se le ha enviado por email
      *
-     * @param id
-     * @param code
-     * @return
+     * @param id Id del usuario
+     * @param code Codigo de verificacion
+     * @return Estado de la operacion
      */
     @Override
     public String comprobarVerificado(int id, String code){
@@ -169,8 +169,8 @@ public class UsuariosService implements IUsuariosService, UserDetailsService {
      * Metodo para implementar el metodo login mediante spring security
      * @param username Nombre de usuario con el que se va a hacer login y
      *                 recuperar sus roles
-     * @return
-     * @throws UsernameNotFoundException
+     * @return Detalles de usuario
+     * @throws UsernameNotFoundException UsernameNotFoundException
      */
     @Override
     @Transactional(readOnly = true)

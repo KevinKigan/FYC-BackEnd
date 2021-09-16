@@ -61,7 +61,7 @@ public class FiltrosService implements IFiltrosService {
      * Metodo para generar la estructrura de filtros a buscar
      *
      * @param mat Matcher con los filtros
-     * @return
+     * @return Filtro
      */
     @Override
     public Filter estructurarFiltros(Matcher mat) {
@@ -255,9 +255,9 @@ public class FiltrosService implements IFiltrosService {
     /**
      * Metodo para aplicar los filtros de busqueda de los modelos
      *
-     * @param pageable
+     * @param pageable Pageable
      * @param filtros  Filtros a aplicar
-     * @return
+     * @return Pagina con los modelos
      */
     @Override
     public Page<Modelo> filtrarModelos(Pageable pageable, Filter filtros) {
