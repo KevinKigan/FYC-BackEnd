@@ -46,8 +46,8 @@ public class ModelosController {
 
     /**
      * Metodo para guardar una marca
-     *
-     * @return Lista de Marcas
+     * @param marca maraca a guardar
+     * @return Marca guardada
      */
     @Secured("ROLE_ADMIN")
     @PostMapping("save_marca")
@@ -68,7 +68,7 @@ public class ModelosController {
 
     /**
      * Metodo para guardar una marca
-     *
+     * @param idsModelos Lista de los ids de los modelos
      * @return Lista de Marcas
      */
     @PostMapping("carrocerias_por_modelo")
@@ -134,7 +134,8 @@ public class ModelosController {
 
     /**
      * Metodo para retornar una pagina con un numero de modelos
-     *
+     * @param page Pagina
+     * @param pageSize Tamaño de la pagina
      * @return Pagina de modelos
      */
     @GetMapping("{pageSize}/page/{page}")
@@ -145,7 +146,8 @@ public class ModelosController {
 
     /**
      * Metodo para retornar una pagina con un numero de modelos
-     *
+     * @param marca Marca del modelo
+     * @param modelo_str Modelo
      * @return Pagina de modelos
      */
     @GetMapping("")
@@ -157,7 +159,9 @@ public class ModelosController {
 
     /**
      * Metodo para retornar una pagina con un numero de modelos
-     *
+     * @param page Pagina
+     * @param pageSize Tamaño de la pagina
+     * @param idmarca Id de la marca
      * @return Pagina de modelos por marcas
      */
     @GetMapping("{pageSize}/idmarca/{idmarca}/page/{page}")
@@ -168,7 +172,7 @@ public class ModelosController {
 
     /**
      * Metodo para retornar todos los modelos segun la marca
-     *
+     * @param idmarca Id de la marca
      * @return Modelos de la marca
      */
     @GetMapping("idmarca/{idmarca}")
@@ -177,7 +181,7 @@ public class ModelosController {
         return modelosService.findAllModelosPorMarca(idmarca);
     }
 
-    /**
+    /*
      * *****************************************************************************************************************
      *                                                 Filtros
      * *****************************************************************************************************************

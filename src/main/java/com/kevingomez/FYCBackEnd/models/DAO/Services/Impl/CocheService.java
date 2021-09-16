@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -21,7 +22,7 @@ import static java.lang.Math.*;
 public class CocheService implements ICocheService {
     private static final double MARGEN = 0.15;
     private static final double MIN = 0;
-    private static final double MAX = pow(10,10);
+    private static final double MAX = pow(10, 10);
     @Autowired
     private ICocheDAO cocheDAO;
     @Autowired
@@ -126,11 +127,7 @@ public class CocheService implements ICocheService {
             }
             chart.put("ConsumoMedio", String.valueOf(cm.getCombinado()));
             chart.put("Precio", String.valueOf(coche.getPrecio()));
-            /*TODO tipos de sobrealimentaciones mas frecuentes
-                si tiene motor electrico
-                si lo tiene, sus caracteristicas (potencias W y caballos CV, tiempo de carga)
-            */
-            chart.put("size",String.valueOf(chart.size()));
+            chart.put("size", String.valueOf(chart.size()));
             return chart;
         } else {
             return null;
@@ -139,162 +136,202 @@ public class CocheService implements ICocheService {
 
     @Override
     @Transactional(readOnly = true)
-    public HashMap<String, String> findChartSemejantesId(int idCoche) {
+    public HashMap<String, String> findChartSemejantesId(int idCoche, String filtro) {
         //Todo semejantes por precio
         HashMap<String, String> chart = new HashMap<>();
         Coche cocheSeleccionado = this.cocheDAO.findById(idCoche).orElse(null);
         if (cocheSeleccionado != null) {
-            int precio = cocheSeleccionado.getPrecio();
             // Busca todos los coches que esten en el margen de precio
-            List<Coche> coches = this.cocheDAO.findAllByPrecioIsGreaterThanEqualAndPrecioIsLessThanEqualAndAndCarroceria_Carroceria(
-                    (int) (precio * (1 - MARGEN)), (int) (precio * (1 + MARGEN)), cocheSeleccionado.getCarroceria().getCarroceria());
-            List<Coche> aux = new ArrayList<>(); // Variable para eliminar los coches del array que coinciden con el modelo actual
-            AtomicReference<Double> mediaPrecio = new AtomicReference<>((double) 0);
-            AtomicReference<Double> mediaConsumoMix = new AtomicReference<>((double) 0);
-            AtomicReference<Double> hp = new AtomicReference<>((double) 0);
-            AtomicReference<Double> cilindrada = new AtomicReference<>((double) 0);
-            AtomicReference<Double> co2 = new AtomicReference<>((double) 0);
-            HashMap<String, Double> destacados = new HashMap<>();
-            HashMap<String, String> destacadosNombre = new HashMap<>();
-            ArrayList<HashMap<Integer, Integer>> ids = new ArrayList<>();
-            HashMap<Integer, Integer> idsConsumoCoche = new HashMap<>();
-            HashMap<Integer, Integer> idsMotorCoche = new HashMap<>();
-            HashMap<Integer, Integer> idsEmisionesCoche = new HashMap<>();
 
-            ids.add(idsConsumoCoche);  // 0
-            ids.add(idsMotorCoche);    // 1
-            ids.add(idsEmisionesCoche);// 2
+            List<Coche> coches = filtrar(cocheSeleccionado, filtro);
+            if (coches.size() > 0) {
+                List<Coche> aux = new ArrayList<>(); // Variable para eliminar los coches del array que coinciden con el modelo actual
+                AtomicReference<Double> mediaPrecio = new AtomicReference<>((double) 0);
+                AtomicReference<Double> mediaConsumoMix = new AtomicReference<>((double) 0);
+                AtomicReference<Double> hp = new AtomicReference<>((double) 0);
+                AtomicReference<Double> cilindrada = new AtomicReference<>((double) 0);
+                AtomicReference<Double> co2 = new AtomicReference<>((double) 0);
+                HashMap<String, Double> destacados = new HashMap<>();
+                HashMap<String, String> destacadosNombre = new HashMap<>();
+                ArrayList<HashMap<Integer, Integer>> ids = new ArrayList<>();
+                HashMap<Integer, Integer> idsConsumoCoche = new HashMap<>();
+                HashMap<Integer, Integer> idsMotorCoche = new HashMap<>();
+                HashMap<Integer, Integer> idsEmisionesCoche = new HashMap<>();
 
-            destacados.put("cochePrecioMin",MAX);
-            destacados.put("cochePrecioMax",MIN);
-            destacados.put("cocheConsumoMin",MAX);
-            destacados.put("cocheConsumoMax",MIN);
-            destacados.put("cochePotenciaMin",MAX);
-            destacados.put("cochePotenciaMax",MIN);
-            destacados.put("cocheEmisionesMin",MAX);
-            destacados.put("cocheEmisionesMax",MIN);
+                ids.add(idsConsumoCoche);  // 0
+                ids.add(idsMotorCoche);    // 1
+                ids.add(idsEmisionesCoche);// 2
 
-            List<Integer> idsConsumo = new ArrayList<>();
-            List<Integer> idsEmisiones = new ArrayList<>();
-            List<Integer> idsTipoMotor = new ArrayList<>();
-            List<Integer> idsMotorCombustion = new ArrayList<>();
-            coches.forEach(coche -> {
-                if (coche.getModelo().getIdModelo() != cocheSeleccionado.getModelo().getIdModelo()) {
-                    int idConsumo = coche.getConsumo().getIdConsumo();
-                    int idMotor = coche.getTipoMotor().getIdTipoMotor();
-                    aux.add(coche);
-                    mediaPrecio.updateAndGet(v -> (v + coche.getPrecio()));
-                    // Compara y actualiza los valores minimo y maximo encotrados de precio
-                    if(coche.getPrecio()< destacados.get("cochePrecioMin")){
-                      destacados.put("cochePrecioMin", (double) coche.getPrecio());
-                      destacados.put("idPrecioMin", (double) coche.getIdCoche());
-                      destacadosNombre.put("nCochePrecioMin", coche.getModelo().getModelo()+"/"+coche.getMarca().getMarcaCoche());
+                destacados.put("cochePrecioMin", MAX);
+                destacados.put("cochePrecioMax", MIN);
+                destacados.put("cocheConsumoMin", MAX);
+                destacados.put("cocheConsumoMax", MIN);
+                destacados.put("cochePotenciaMin", MAX);
+                destacados.put("cochePotenciaMax", MIN);
+                destacados.put("cocheEmisionesMin", MAX);
+                destacados.put("cocheEmisionesMax", MIN);
+
+                List<Integer> idsConsumo = new ArrayList<>();
+                List<Integer> idsEmisiones = new ArrayList<>();
+                List<Integer> idsTipoMotor = new ArrayList<>();
+                List<Integer> idsMotorCombustion = new ArrayList<>();
+                coches.forEach(coche -> {
+                    if (coche.getModelo().getIdModelo() != cocheSeleccionado.getModelo().getIdModelo()) {
+                        int idConsumo = coche.getConsumo().getIdConsumo();
+                        int idMotor = coche.getTipoMotor().getIdTipoMotor();
+                        aux.add(coche);
+                        mediaPrecio.updateAndGet(v -> (v + coche.getPrecio()));
+                        // Compara y actualiza los valores minimo y maximo encotrados de precio
+                        if (coche.getPrecio() < destacados.get("cochePrecioMin")) {
+                            destacados.put("cochePrecioMin", (double) coche.getPrecio());
+                            destacados.put("idPrecioMin", (double) coche.getIdCoche());
+                            destacadosNombre.put("nCochePrecioMin", coche.getModelo().getModelo() + "/" + coche.getMarca().getMarcaCoche());
+                        }
+                        if (coche.getPrecio() > destacados.get("cochePrecioMax")) {
+                            destacados.put("cochePrecioMax", (double) coche.getPrecio());
+                            destacados.put("idPrecioMax", (double) coche.getIdCoche());
+                            destacadosNombre.put("nCochePrecioMax", coche.getModelo().getModelo() + "/" + coche.getMarca().getMarcaCoche());
+                        }
+                        ids.get(0).put(coche.getIdCoche(), idConsumo);
+                        idsConsumo.add(idConsumo);
+                        ids.get(1).put(coche.getIdCoche(), idMotor);
+                        idsTipoMotor.add(idMotor);
+
                     }
-                    if(coche.getPrecio()> destacados.get("cochePrecioMax")){
-                        destacados.put("cochePrecioMax", (double) coche.getPrecio());
-                        destacados.put("idPrecioMax", (double) coche.getIdCoche());
-                        destacadosNombre.put("nCochePrecioMax", coche.getModelo().getModelo()+"/"+coche.getMarca().getMarcaCoche());
+                });
+                // Compara y actualiza los valores minimo y maximo encotrados de consumo
+                this.consumoNormalDAO.findAllById(idsConsumo).forEach(consumoNormal -> {
+                    if (consumoNormal.getCombinado() < destacados.get("cocheConsumoMin")) {
+                        destacados.put("cocheConsumoMin", consumoNormal.getCombinado());
+                        destacados.put("idConsumoMin", (double) consumoNormal.getIdConsumoNormal());
                     }
-                    ids.get(0).put(coche.getIdCoche(), idConsumo);
-                    idsConsumo.add(idConsumo);
-                    ids.get(1).put(coche.getIdCoche(), idMotor);
-                    idsTipoMotor.add(idMotor);
+                    if (consumoNormal.getCombinado() > destacados.get("cocheConsumoMax")) {
+                        destacados.put("cocheConsumoMax", consumoNormal.getCombinado());
+                        destacados.put("idConsumoMax", (double) consumoNormal.getIdConsumoNormal());
+                    }
+                    mediaConsumoMix.updateAndGet(v -> v + consumoNormal.getCombinado());
+                });
+                this.tipoMotorDAO.findAllById(idsTipoMotor).forEach(tm -> {
+                    idsMotorCombustion.add(tm.getMotorCombustion().getIdMotorCombustion());
+                });
+                this.motorCombustionDAO.findAllById(idsMotorCombustion).forEach(motorCombustion -> {
+                    int idEmisiones = motorCombustion.getEmisiones().getIdEmisiones();
+                    hp.updateAndGet(v -> v + motorCombustion.getHp());
+                    cilindrada.updateAndGet(v -> v + motorCombustion.getCilindrada());
+                    ids.get(2).put(ids.get(1).get(motorCombustion.getIdMotorCombustion()), idEmisiones);
+                    idsEmisiones.add(idEmisiones);
+                    if (motorCombustion.getHp() < destacados.get("cochePotenciaMin")) {
+                        destacados.put("cochePotenciaMin", (double) motorCombustion.getHp());
+                        destacados.put("idMotorCMin", (double) motorCombustion.getIdMotorCombustion());
+                    }
+                    if (motorCombustion.getHp() > destacados.get("cochePotenciaMax")) {
+                        destacados.put("cochePotenciaMax", (double) motorCombustion.getHp());
+                        destacados.put("idMotorCMax", (double) motorCombustion.getIdMotorCombustion());
+                    }
+                });
+                this.emisionesDAO.findAllById(idsEmisiones).forEach(emisiones -> {
+                    co2.updateAndGet(v -> v + emisiones.getCO2());
+                    if (emisiones.getCO2() < destacados.get("cocheEmisionesMin")) {
+                        destacados.put("cocheEmisionesMin", (double) emisiones.getCO2());
+                        destacados.put("idEmisionesMin", (double) emisiones.getIdEmisiones());
+                    }
+                    if (emisiones.getCO2() > destacados.get("cocheEmisionesMax")) {
+                        destacados.put("cocheEmisionesMax", (double) emisiones.getCO2());
+                        destacados.put("idEmisionesMax", (double) emisiones.getIdEmisiones());
+                    }
+                });
+                int mediaP = (int) round(mediaPrecio.updateAndGet(aDouble -> aDouble / aux.size()));
+                int mediaHP = (int) round(hp.updateAndGet(aDouble -> aDouble / aux.size()));
+                double mediaCilindrada = round(cilindrada.updateAndGet(aDouble -> aDouble / aux.size()) * 10);
+                mediaCilindrada /= 10;
+                int mediaCO2 = (int) round(co2.updateAndGet(aDouble -> aDouble / aux.size()));
+                double mediaConsMix = round(mediaConsumoMix.updateAndGet(aDouble -> aDouble / aux.size()) * 100);
+                mediaConsMix /= 100;
 
-                }
-            });
-            // Compara y actualiza los valores minimo y maximo encotrados de consumo
-            this.consumoNormalDAO.findAllById(idsConsumo).forEach(consumoNormal -> {
-                if(consumoNormal.getCombinado()< destacados.get("cocheConsumoMin")){
-                    destacados.put("cocheConsumoMin", consumoNormal.getCombinado());
-                    destacados.put("idConsumoMin", (double)consumoNormal.getIdConsumoNormal());
-                }
-                if(consumoNormal.getCombinado()> destacados.get("cocheConsumoMax")){
-                    destacados.put("cocheConsumoMax", consumoNormal.getCombinado());
-                    destacados.put("idConsumoMax", (double)consumoNormal.getIdConsumoNormal());
-                }
-                mediaConsumoMix.updateAndGet(v -> v + consumoNormal.getCombinado());
-            });
-            this.tipoMotorDAO.findAllById(idsTipoMotor).forEach(tm->{
-                idsMotorCombustion.add(tm.getMotorCombustion().getIdMotorCombustion());
-            });
-            this.motorCombustionDAO.findAllById(idsMotorCombustion).forEach(motorCombustion -> {
-                int idEmisiones = motorCombustion.getEmisiones().getIdEmisiones();
-                hp.updateAndGet(v -> v + motorCombustion.getHp());
-                cilindrada.updateAndGet(v -> v + motorCombustion.getCilindrada());
-                ids.get(2).put(ids.get(1).get(motorCombustion.getIdMotorCombustion()), idEmisiones);
-                idsEmisiones.add(idEmisiones);
-                if(motorCombustion.getHp()< destacados.get("cochePotenciaMin")){
-                    destacados.put("cochePotenciaMin", (double) motorCombustion.getHp());
-                    destacados.put("idMotorCMin", (double)motorCombustion.getIdMotorCombustion());
-                }
-                if(motorCombustion.getHp()> destacados.get("cochePotenciaMax")){
-                    destacados.put("cochePotenciaMax", (double) motorCombustion.getHp());
-                    destacados.put("idMotorCMax", (double)motorCombustion.getIdMotorCombustion());
-                }
-            });
-            this.emisionesDAO.findAllById(idsEmisiones).forEach(emisiones -> {
-                co2.updateAndGet(v -> v + emisiones.getCO2());
-                if(emisiones.getCO2()< destacados.get("cocheEmisionesMin")){
-                    destacados.put("cocheEmisionesMin", (double) emisiones.getCO2());
-                    destacados.put("idEmisionesMin", (double) emisiones.getIdEmisiones());
-                }
-                if(emisiones.getCO2()> destacados.get("cocheEmisionesMax")){
-                    destacados.put("cocheEmisionesMax", (double) emisiones.getCO2());
-                    destacados.put("idEmisionesMax", (double) emisiones.getIdEmisiones());
-                }
-            });
-            int mediaP = (int) round(mediaPrecio.updateAndGet(aDouble -> aDouble / aux.size()));
-            int mediaHP = (int) round(hp.updateAndGet(aDouble -> aDouble / aux.size()));
-            double mediaCilindrada = round(cilindrada.updateAndGet(aDouble -> aDouble / aux.size())*10);
-            mediaCilindrada/=10;
-            int mediaCO2 = (int) round(co2.updateAndGet(aDouble -> aDouble / aux.size()));
-            double mediaConsMix = round(mediaConsumoMix.updateAndGet(aDouble -> aDouble / aux.size())*100);
-            mediaConsMix/=100;
+                chart.put("mediaPrecio", String.valueOf(mediaP));
+                chart.put("mediaPotencia", String.valueOf(mediaHP));
+                chart.put("mediaCilindrada", String.valueOf(mediaCilindrada));
+                chart.put("mediaEmisiones", String.valueOf(mediaCO2));
+                chart.put("mediaConsumo", String.valueOf(mediaConsMix));
+                List<Integer> idsN;
 
-            chart.put("mediaPrecio",String.valueOf(mediaP));
-            chart.put("mediaPotencia",String.valueOf(mediaHP));
-            chart.put("mediaCilindrada",String.valueOf(mediaCilindrada));
-            chart.put("mediaEmisiones",String.valueOf(mediaCO2));
-            chart.put("mediaConsumo",String.valueOf(mediaConsMix));
-//            chart.put("modeloPrecioMin",destacadosNombre.get("nCochePrecioMin"));
-//            chart.put("modeloPrecioMax",destacadosNombre.get("nCochePrecioMax"));
-            List<Integer> idsN;// = new ArrayList<>();
-//            idsN.add(Math.round(Float.parseFloat(destacadosNombre.get("idPrecioMin"))));
-//            idsN.add(Math.round(Float.parseFloat(destacadosNombre.get("idPrecioMax"))));
-//            List<Coche> cocheMinMax = this.cocheDAO.findAllByIdCocheIn(idsN);
-//            chart.put("modeloPrecioMinImage",);
-//            chart.put("modeloPrecioMaxImage",);
-
-
-            String[] chartP={"modeloPrecio","modeloConsumo", "modeloPotencia","modeloEmisiones"};
-            String[] dest = {"idPrecio","idConsumo", "idMotorC","idEmisiones"};
-            // Se añaden al chart los modelos con valores minimo y maximo en consumo, potencia y emisiones
-            for (int i = 0;i<4;i++){
-                idsN = new ArrayList<>();
-                if(i==0){
-                    idsN.add((int) Math.round(destacados.get(dest[i] + "Min")));
-                    idsN.add((int) Math.round(destacados.get(dest[i] + "Max")));
-                }else{
-                    idsN.add(ids.get(i-1).get((int) Math.round(destacados.get(dest[i] + "Min"))));
-                    idsN.add(ids.get(i-1).get((int) Math.round(destacados.get(dest[i] + "Max"))));
+                String[] chartP = {"modeloPrecio", "modeloConsumo", "modeloPotencia", "modeloEmisiones"};
+                String[] dest = {"idPrecio", "idConsumo", "idMotorC", "idEmisiones"};
+                // Se añaden al chart los modelos con valores minimo y maximo en consumo, potencia y emisiones
+                for (int i = 0; i < 4; i++) {
+                    idsN = new ArrayList<>();
+                    if (i == 0) {
+                        idsN.add((int) Math.round(destacados.get(dest[i] + "Min")));
+                        idsN.add((int) Math.round(destacados.get(dest[i] + "Max")));
+                    } else {
+                        idsN.add(ids.get(i - 1).get((int) Math.round(destacados.get(dest[i] + "Min"))));
+                        idsN.add(ids.get(i - 1).get((int) Math.round(destacados.get(dest[i] + "Max"))));
+                    }
+                    List<Coche> cocheMinMax = this.cocheDAO.findAllByIdCocheIn(idsN);
+                    if (cocheMinMax.size() == 1) { // Caso en el que la lista de adsN sean ambos el mismo id
+                        cocheMinMax.add(this.cocheDAO.findById(idsN.get(0)).orElse(null));
+                    }
+                    chart.put(chartP[i] + "Min", cocheMinMax.get(0).getModelo().getModelo() + "/" + cocheMinMax.get(0).getMarca().getMarcaCoche());
+                    chart.put(chartP[i] + "Max", cocheMinMax.get(1).getModelo().getModelo() + "/" + cocheMinMax.get(1).getMarca().getMarcaCoche());
+                    chart.put(chartP[i] + "MinImage", cocheMinMax.get(0).getModelo().getImagen());
+                    chart.put(chartP[i] + "MaxImage", cocheMinMax.get(1).getModelo().getImagen());
+                    chart.put("id" + chartP[i] + "Min", String.valueOf(cocheMinMax.get(0).getModelo().getIdModelo()));
+                    chart.put("id" + chartP[i] + "Max", String.valueOf(cocheMinMax.get(1).getModelo().getIdModelo()));
                 }
-                List<Coche> cocheMinMax = this.cocheDAO.findAllByIdCocheIn(idsN);
-                if(cocheMinMax.size()==1){ // Caso en el que la lista de adsN sean ambos el mismo id
-                    cocheMinMax.add(this.cocheDAO.findById(idsN.get(0)).orElse(null));
-                }
-                chart.put(chartP[i]+"Min",cocheMinMax.get(0).getModelo().getModelo()+"/"+cocheMinMax.get(0).getMarca().getMarcaCoche());
-                chart.put(chartP[i]+"Max",cocheMinMax.get(1).getModelo().getModelo()+"/"+cocheMinMax.get(1).getMarca().getMarcaCoche());
-                chart.put(chartP[i]+"MinImage",cocheMinMax.get(0).getModelo().getImagen());
-                chart.put(chartP[i]+"MaxImage",cocheMinMax.get(1).getModelo().getImagen());
-                chart.put("id"+chartP[i]+"Min",String.valueOf(cocheMinMax.get(0).getModelo().getIdModelo()));
-                chart.put("id"+chartP[i]+"Max",String.valueOf(cocheMinMax.get(1).getModelo().getIdModelo()));
+
+                chart.put("size", String.valueOf(chart.size()));
+                return chart;
+            } else {
+                return null;
             }
-
-            chart.put("size",String.valueOf(chart.size()));
-            return chart;
         } else {
             return null;
         }
+    }
+
+    private List<Coche> filtrar(Coche coche, String filtro) {
+        int precio = coche.getPrecio();
+        List<Coche> coches = null;
+        switch (filtro) {
+            case "Potencia":
+                int hp = coche.getTipoMotor().getMotorCombustion().getHp();
+                List<MotorCombustion> motores = motorCombustionDAO.findAllByHpIsGreaterThanEqualAndHpIsLessThanEqual((int) (hp * (1 - (MARGEN + 0.2))), (int) (hp * (1 + (MARGEN + 0.2))));
+                List<Integer> idsMotores = new ArrayList<>();
+                motores.forEach(mot -> idsMotores.add(mot.getIdMotorCombustion()));
+                coches = this.cocheDAO.findAllByCarroceria_CarroceriaAndTipoMotor_MotorCombustion_IdMotorCombustionIn(coche.getCarroceria().getCarroceria(), idsMotores);
+                break;
+            case "Cilindrada":
+                double cilindrada = coche.getTipoMotor().getMotorCombustion().getCilindrada();
+                List<MotorCombustion> motores2 = motorCombustionDAO.findAllByCilindradaIsGreaterThanEqualAndCilindradaIsLessThanEqual(cilindrada * (1 - MARGEN), cilindrada * (1 + MARGEN));
+                List<Integer> idsMotores2 = new ArrayList<>();
+                motores2.forEach(mot -> idsMotores2.add(mot.getIdMotorCombustion()));
+                coches = this.cocheDAO.findAllByCarroceria_CarroceriaAndTipoMotor_MotorCombustion_IdMotorCombustionIn(coche.getCarroceria().getCarroceria(), idsMotores2);
+                break;
+            case "Emisiones":
+                int emi = coche.getTipoMotor().getMotorCombustion().getEmisiones().getCO2();
+                List<Emisiones> emisiones = this.emisionesDAO.findAllByCO2IsGreaterThanEqualAndCO2IsLessThanEqual((int) (emi * (1 - (MARGEN + 0.4))), (int) (emi * (1 + (MARGEN + 0.4))));
+                ArrayList<Integer> idsEmisiones = new ArrayList<>();
+                emisiones.forEach(emis -> idsEmisiones.add(emis.getIdEmisiones()));
+                List<MotorCombustion> motores1 = this.motorCombustionDAO.findAllByEmisiones_IdEmisionesIn(idsEmisiones);
+                List<Integer> idsMotores1 = new ArrayList<>();
+                motores1.forEach(mot -> idsMotores1.add(mot.getIdMotorCombustion()));
+                coches = this.cocheDAO.findAllByCarroceria_CarroceriaAndTipoMotor_MotorCombustion_IdMotorCombustionIn(coche.getCarroceria().getCarroceria(), idsMotores1);
+                break;
+            case "Consumo":
+                double consumoCoche = coche.getConsumo().getIdConsumoNormal().getCombinado();
+                List<Consumo> consumos = consumoDAO.findAllByIdConsumoNormal_CombinadoIsGreaterThanEqualAndIdConsumoNormal_CombinadoIsLessThanEqual(
+                        consumoCoche * (1 - MARGEN), consumoCoche * (1 + MARGEN));
+                List<Integer> idsConsumos = new ArrayList<>();
+                consumos.forEach(cons -> idsConsumos.add(cons.getIdConsumo()));
+                System.out.println(coche.getConsumo().getIdConsumoNormal().getCombinado());
+                coches = this.cocheDAO.findAllByCarroceria_CarroceriaAndConsumo_IdConsumoIn(coche.getCarroceria().getCarroceria(), idsConsumos);
+                break;
+            default: // Precio
+                coches = this.cocheDAO.findAllByPrecioIsGreaterThanEqualAndPrecioIsLessThanEqualAndAndCarroceria_Carroceria(
+                        (int) (precio * (1 - MARGEN)), (int) (precio * (1 + MARGEN)), coche.getCarroceria().getCarroceria());
+                break;
+        }
+        return coches;
     }
 
     @Override
@@ -306,8 +343,8 @@ public class CocheService implements ICocheService {
     /**
      * Metodo para retornar todos los coches segun el modelo especificado
      *
-     * @param idModelo
-     * @return
+     * @param idModelo Id del modelo
+     * @return Lista de coches
      */
     @Override
     @Transactional(readOnly = true)
@@ -516,7 +553,7 @@ public class CocheService implements ICocheService {
     public MotorCombustion saveMotorCombustion(MotorCombustion motorCombustion) {
         Sobrealimentacion sobrealimentacion = motorCombustion.getSobrealimentacion();
         Combustible combustible = motorCombustion.getCombustible();
-        if(combustible.getTipoCombustibleAlternativo().getIdCombustible() == 0){
+        if (combustible.getTipoCombustibleAlternativo().getIdCombustible() == 0) {
             combustible.getTipoCombustibleAlternativo().setIdCombustible(combustible.getTipoCombustibleNormal().getIdCombustible());
         }
         this.combustibleDAO.save(combustible);
@@ -538,10 +575,10 @@ public class CocheService implements ICocheService {
     public Consumo saveConsumo(Consumo consumo) {
         ConsumoNormal cn = consumo.getIdConsumoNormal();
         ConsumoAlternativo ca = consumo.getIdConsumoAlternativo();
-        ConsumoElectrico ce= consumo.getIdConsumoElectrico();
-        if(cn!=null) this.consumoNormalDAO.save(cn);
-        if(ca!=null) this.consumoAlternativoDAO.save(ca);
-        if(ce!=null) this.consumoElectricoDAO.save(ce);
+        ConsumoElectrico ce = consumo.getIdConsumoElectrico();
+        if (cn != null) this.consumoNormalDAO.save(cn);
+        if (ca != null) this.consumoAlternativoDAO.save(ca);
+        if (ce != null) this.consumoElectricoDAO.save(ce);
         return this.consumoDAO.save(consumo);
     }
 

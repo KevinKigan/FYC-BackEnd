@@ -6,6 +6,7 @@ import com.kevingomez.FYCBackEnd.models.DAO.dao.Interfaces.ICocheDAO;
 import com.kevingomez.FYCBackEnd.models.DAO.dao.Interfaces.IMarcaDAO;
 import com.kevingomez.FYCBackEnd.models.DAO.dao.Interfaces.IModeloDAO;
 import com.kevingomez.FYCBackEnd.models.entity.Coches.Carroceria;
+import com.kevingomez.FYCBackEnd.models.entity.Coches.Coche;
 import com.kevingomez.FYCBackEnd.models.entity.Coches.Marca;
 import com.kevingomez.FYCBackEnd.models.entity.Coches.Modelo;
 import org.slf4j.Logger;
@@ -52,7 +53,6 @@ public class ModelosService implements IModelosService {
     public Marca saveMarca(Marca marca) {
         return marcaDAO.save(marca);
     }
-
 
 
     /**
@@ -128,16 +128,25 @@ public class ModelosService implements IModelosService {
     }
 
     @Override
-    public HashMap<String,String> findImagen(String modelo, String marca) {
-        HashMap<String,String> map = new HashMap();
-        map.put("imagen",this.modeloDAO.findByModeloAndMarca_MarcaCoche(modelo, marca).getImagen());
+    public HashMap<String, String> findImagen(String modelo, String marca) {
+        HashMap<String, String> map = new HashMap();
+        map.put("imagen", this.modeloDAO.findByModeloAndMarca_MarcaCoche(modelo, marca).getImagen());
         return map;
     }
 
     @Override
     public HashMap<Integer, String> findAllCarroceriasPorModelo(List<Integer> idsModelos) {
         HashMap<Integer, String> map = new HashMap<>();
-        idsModelos.forEach(idModelo -> map.put(idModelo,this.cocheDAO.findTop1ByModelo_IdModelo(idModelo).getCarroceria().getCarroceria()));
+        idsModelos.forEach(idModelo -> {
+            Coche coche = this.cocheDAO.findTop1ByModelo_IdModelo(idModelo);
+            if(coche != null) {
+                if (coche.getCarroceria() == null) {
+                    map.put(idModelo, "");
+                } else {
+                    map.put(idModelo, coche.getCarroceria().getCarroceria());
+                }
+            }
+        });
         return map;
     }
 

@@ -34,7 +34,7 @@ public class ImagesController {
 
     /**
      * Metodo para obtener el logo de las marca
-     *
+     * @param idMarca Id de la marca
      * @return Logo de la marca
      */
     @GetMapping("marcaslogo/{idMarca}")
@@ -56,7 +56,7 @@ public class ImagesController {
 
     /**
      * Metodo para obtener el logo de los modelos
-     *
+     * @param idsModelos Lista de ids de los modelos
      * @return Logo del modelo
      */
     @PostMapping("modeloslogo")

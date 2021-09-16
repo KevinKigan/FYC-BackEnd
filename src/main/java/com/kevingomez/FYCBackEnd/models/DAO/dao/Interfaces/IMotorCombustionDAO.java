@@ -11,6 +11,7 @@ public interface IMotorCombustionDAO extends JpaRepository<MotorCombustion, Inte
     List<MotorCombustion> findAllByCilindros(int cilindros);
     List<MotorCombustion> findAllByCilindrada(double cilindrada);
     List<MotorCombustion> findAllByHpIsGreaterThanEqualAndHpIsLessThanEqual(int hpMin, int hpMax);
+    List<MotorCombustion> findAllByCilindradaIsGreaterThanEqualAndCilindradaIsLessThanEqual(double cilindradaMin, double cilindradaMax);
     List<MotorCombustion> findByIdMotorCombustionIn(List<Integer> idsMotorCombustion);
 
 

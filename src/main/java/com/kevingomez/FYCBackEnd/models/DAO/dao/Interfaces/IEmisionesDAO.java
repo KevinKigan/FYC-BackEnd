@@ -8,6 +8,7 @@ import java.util.List;
 
 public interface IEmisionesDAO extends JpaRepository<Emisiones, Integer> {
     List<Emisiones> findAllByCO2IsLessThanEqual(int CO2);
+    List<Emisiones> findAllByCO2IsGreaterThanEqualAndCO2IsLessThanEqual(int minCO2, int maxCO2);
     List<Emisiones> findAllByTipoEmisiones_IdTipoEmisiones(int id);
 
 }
